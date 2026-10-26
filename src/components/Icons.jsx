@@ -12,3 +12,4 @@ export const UserPlusIcon = I(<><circle cx="9" cy="8" r="4" /><path d="M3 21a6 6
 export const StarIcon = I(<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z" />);
 export const CheckIcon = I(<path d="m5 12 5 5 9-10" />);
 export const MsgIcon = I(<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12" />);
+export const SendIcon = I(<><path d="M21 3 3 10.5l7 3 3 7z" /><path d="m10 13.5 4-4" /></>);

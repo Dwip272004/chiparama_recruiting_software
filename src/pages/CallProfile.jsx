@@ -5,6 +5,9 @@ import {
   CALL_STATUSES, CHANNELS, fetchActivity, fetchCallList, logCall, callBucket, sortForCalling,
   statusMeta, fmtDateTime, initials,
 } from "../lib/outreach";
+import { InmailBadge, InmailRequestModal } from "../components/InmailRequest";
+import { fetchPendingInmailIds, inmailState } from "../lib/inmail";
+import { useAuth } from "../auth/AuthContext";
 import "../outreach.css";
 
 const OUTCOMES = CALL_STATUSES.filter((s) => s.key !== "not_called");
@@ -117,6 +120,12 @@ function Profile({ row, pos, total, upNext, onSaved, onGo, nextId, prevId, onFin
   const [error, setError] = useState("");
   const [activity, setActivity] = useState([]);
   const noteRef = useRef(null);
+  const { can } = useAuth();
+  const [pendingIds, setPendingIds] = useState(new Set());
+  const [inmailModal, setInmailModal] = useState(false);
+  const [inmailMsg, setInmailMsg] = useState("");
+  useEffect(() => { fetchPendingInmailIds().then(setPendingIds).catch(() => {}); }, [row.id]);
+  const inState = inmailState(row, pendingIds);
 
   useEffect(() => {
     fetchActivity(row.id).then(setActivity).catch(() => {});
@@ -312,6 +321,22 @@ function Profile({ row, pos, total, upNext, onSaved, onGo, nextId, prevId, onFin
             <button className="ghost" disabled={busy} onClick={() => save(false)}>Save and stay</button>
             <div className="hint">Shortcuts: 1–8 pick an outcome · Ctrl/⌘ + Enter saves & moves on. The time of the call is recorded automatically.</div>
           </section>
+
+          {can("inmail.request") && (
+            <section className="card">
+              <div className="row-between"><h3>LinkedIn InMail</h3><InmailBadge state={inState} /></div>
+              <div className="muted small">InMails are paid and sent only by the admins. Ask for one if phone isn't working.</div>
+              {inmailMsg && <div className="msg ok">{inmailMsg}</div>}
+              {inState === "none" && <button className="ghost" onClick={() => setInmailModal(true)}>Request InMail for this candidate</button>}
+              {inmailModal && (
+                <InmailRequestModal
+                  rows={[row]}
+                  onClose={() => setInmailModal(false)}
+                  onDone={async () => { setInmailModal(false); setInmailMsg("Request sent to the admins."); setPendingIds(await fetchPendingInmailIds()); }}
+                />
+              )}
+            </section>
+          )}
 
           {upNext.length > 0 && (
             <section className="card">

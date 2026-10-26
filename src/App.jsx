@@ -9,6 +9,7 @@ import Jobs from "./pages/Jobs";
 import JobCandidates from "./pages/JobCandidates";
 import CallingList from "./pages/CallingList";
 import CallProfile from "./pages/CallProfile";
+import Inmails from "./pages/Inmails";
 
 export default function App() {
   return (
@@ -46,6 +47,14 @@ export default function App() {
               element={
                 <ProtectedRoute permission="calling.view">
                   <CallingList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/inmails"
+              element={
+                <ProtectedRoute permission="inmail.view">
+                  <Inmails />
                 </ProtectedRoute>
               }
             />

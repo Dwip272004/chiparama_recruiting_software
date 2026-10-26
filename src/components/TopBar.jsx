@@ -4,7 +4,7 @@ import { useAuth } from "../auth/AuthContext";
 import { fetchNotifications, markRead, fetchActivityFeed } from "../lib/notifications";
 import { channelByKey, statusMeta, initials } from "../lib/outreach";
 import { timeAgo } from "../lib/dashboard";
-import { BellIcon, PulseIcon, FileIcon, UserPlusIcon, StarIcon, MsgIcon, CheckIcon, PhoneIcon } from "./Icons";
+import { SendIcon, BellIcon, PulseIcon, FileIcon, UserPlusIcon, StarIcon, MsgIcon, CheckIcon, PhoneIcon } from "./Icons";
 
 const TITLES = [
   [/^\/jobs\/[^/]+\/candidates/, "Job candidates"],
@@ -20,6 +20,9 @@ const NOTE_ICON = {
   assigned: [UserPlusIcon, "amber"],
   candidate_interested: [StarIcon, "green"],
   candidate_replied: [MsgIcon, "purple"],
+  inmail_request: [SendIcon, "amber"],
+  inmail_sent: [SendIcon, "green"],
+  inmail_skipped: [SendIcon, "gray"],
 };
 
 function useOutside(ref, onClose) {

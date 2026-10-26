@@ -1,8 +1,10 @@
+import { useEffect, useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { ROLES } from "../lib/roles";
 import TopBar from "./TopBar";
-import { GridIcon, BriefcaseIcon, PhoneIcon, LogoutIcon } from "./Icons";
+import { GridIcon, BriefcaseIcon, PhoneIcon, LogoutIcon, SendIcon } from "./Icons";
+import { fetchInmailPendingCount } from "../lib/inmail";
 import "../jobs.css";
 import "../layout.css";
 
@@ -10,10 +12,19 @@ const NAV = [
   { to: "/", label: "Dashboard", perm: "dashboard.view", end: true, Icon: GridIcon },
   { to: "/jobs", label: "Jobs", perm: "jobs.view", Icon: BriefcaseIcon },
   { to: "/calling", label: "Calling list", perm: "calling.view", Icon: PhoneIcon },
+  { to: "/inmails", label: "InMails", perm: "inmail.view", Icon: SendIcon, badge: true },
 ];
 
 export default function Layout() {
   const { profile, role, can, signOut } = useAuth();
+  const [inmailWaiting, setInmailWaiting] = useState(0);
+  useEffect(() => {
+    if (!can("inmail.send")) return;
+    const load = () => fetchInmailPendingCount().then(setInmailWaiting).catch(() => {});
+    load();
+    const t = setInterval(load, 45000);
+    return () => clearInterval(t);
+  }, [can]);
   return (
     <div className="shell">
       <aside className="sidebar">
@@ -22,6 +33,7 @@ export default function Layout() {
           {NAV.filter((n) => can(n.perm)).map((n) => (
             <NavLink key={n.to} to={n.to} end={n.end} className={({ isActive }) => (isActive ? "active" : "")}>
               <n.Icon /> {n.label}
+              {n.badge && inmailWaiting > 0 && <span className="nav-badge">{inmailWaiting}</span>}
             </NavLink>
           ))}
         </nav>
