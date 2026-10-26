@@ -6,6 +6,8 @@ import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import Jobs from "./pages/Jobs";
+import JobCandidates from "./pages/JobCandidates";
+import CallingList from "./pages/CallingList";
 
 export default function App() {
   return (
@@ -22,6 +24,22 @@ export default function App() {
             }
           >
             <Route path="/" element={<Dashboard />} />
+            <Route
+              path="/jobs/:jobCode/candidates"
+              element={
+                <ProtectedRoute permission="candidates.manage">
+                  <JobCandidates />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/calling"
+              element={
+                <ProtectedRoute permission="calling.view">
+                  <CallingList />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/jobs/:jobCode?"
               element={

@@ -4,6 +4,7 @@ import { useAuth } from "../auth/AuthContext";
 import { fetchJobs, fetchStatuses, jobTitle } from "../lib/jobs";
 import StatusBadge from "../components/StatusBadge";
 import SubmitJD from "../components/SubmitJD";
+import { fetchCallList, callBucket } from "../lib/outreach";
 
 export default function Dashboard() {
   const { profile, session, can } = useAuth();
@@ -22,7 +23,18 @@ export default function Dashboard() {
       setError(e.message);
     }
   };
+  const [callQueue, setCallQueue] = useState(null);
   useEffect(() => { load(); }, []);
+  useEffect(() => {
+    if (!can("calling.view")) return;
+    fetchCallList()
+      .then((rows) => {
+        const b = rows.map(callBucket);
+        setCallQueue({ todo: b.filter((x) => x === "new" || x === "retry").length, due: b.filter((x) => x === "followup").length });
+      })
+      .catch(() => {});
+    // eslint-disable-next-line
+  }, []);
 
   const reviewer = can("jobs.review");
   const pending = jobs.filter((j) => j.status === "pending_review");
@@ -76,6 +88,19 @@ export default function Dashboard() {
         )}
 
         <div className="stack">
+          {can("calling.view") && (
+            <section className="card">
+              <h3>Your calling queue</h3>
+              {callQueue === null ? (
+                <div className="empty small">Loading…</div>
+              ) : (
+                <div className="muted">
+                  <b>{callQueue.todo}</b> to call · <b className={callQueue.due ? "due" : ""}>{callQueue.due}</b> follow-ups due
+                </div>
+              )}
+              <button className="primary" onClick={() => navigate("/calling")}>Open calling list</button>
+            </section>
+          )}
           {reviewer && (
             <section className="card">
               <h3>Awaiting review <span className="count">{pending.length}</span></h3>

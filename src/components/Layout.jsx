@@ -6,6 +6,7 @@ import "../jobs.css";
 const NAV = [
   { to: "/", label: "Dashboard", perm: "dashboard.view", end: true },
   { to: "/jobs", label: "Jobs", perm: "jobs.view" },
+  { to: "/calling", label: "Calling list", perm: "calling.view" },
 ];
 
 export default function Layout() {

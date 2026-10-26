@@ -17,7 +17,8 @@ export const PERMISSIONS = {
     "jobs.submit",
     "jobs.review", // structure JDs, change status, edit job details
     "jobs.statuses", // manage the list of statuses
-    "candidates.manage",
+    "candidates.manage", // upload lots, manage the 4 outreach channels
+    "calling.view", // calling list (admins see every caller's list)
     "clients.manage",
     "outreach.manage",
     "reports.view",
@@ -28,8 +29,7 @@ export const PERMISSIONS = {
     "dashboard.view",
     "jobs.view",
     "jobs.submit",
-    "candidates.manage",
-    "outreach.manage",
+    "calling.view", // recruiting managers only make calls
     "reports.view",
   ],
 };

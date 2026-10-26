@@ -126,6 +126,7 @@ export default function Jobs() {
             statuses={statuses}
             canEdit={canReview}
             onSave={onSave}
+            onManage={can("candidates.manage") ? () => navigate(`/jobs/${selected.job_code}/candidates`) : undefined}
           />
         )}
       </Drawer>

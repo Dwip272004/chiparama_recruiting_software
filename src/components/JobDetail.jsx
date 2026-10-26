@@ -19,7 +19,7 @@ const TEXTAREAS = [
 
 const fmt = (d) => (d ? new Date(d).toLocaleString() : "—");
 
-export default function JobDetail({ job, statuses, canEdit, onSave }) {
+export default function JobDetail({ job, statuses, canEdit, onSave, onManage }) {
   const [form, setForm] = useState(() => ({
     job_code: job.job_code,
     title: job.title ?? "",
@@ -111,6 +111,11 @@ export default function JobDetail({ job, statuses, canEdit, onSave }) {
 
   return (
     <form className="stack" onSubmit={submit}>
+      {onManage && !pending && (
+        <button type="button" className="ghost" onClick={onManage}>
+          Candidates & outreach (RCS, Email, LinkedIn, Calling) →
+        </button>
+      )}
       {pending && (
         <div className="msg info">
           New JD. Fill in the structured details, then change the status (for example to Open) to publish it.
