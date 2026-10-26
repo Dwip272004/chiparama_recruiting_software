@@ -1,5 +1,8 @@
-.kpis { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; margin-bottom: 20px; }
-.kpi { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
+.kpi { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; position: relative; overflow: hidden; transition: border-color .15s, transform .15s; }
+.kpi::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--accent); opacity: .7; }
+.kpi.alert::before { background: #fbd34d; } .kpi.good::before { background: #4ade80; }
+.kpi[role=button], .kpi.click { cursor: pointer; }
 .kpi[onclick], .kpi:hover { border-color: #34405a; }
 .kpi .num { font-size: 30px; font-weight: 700; line-height: 1.1; }
 .kpi .lbl { color: var(--muted); font-size: 13px; margin-top: 4px; }
@@ -7,9 +10,16 @@
 .kpi.alert .num { color: #fbd34d; }
 .kpi.good .num { color: #4ade80; }
 
-.dash-two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; margin-bottom: 8px; }
+.dash-two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: stretch; margin-bottom: 8px; }
+.dash-two > .card { min-height: 0; }
 @media (max-width: 900px) { .dash-two { grid-template-columns: 1fr; } }
-.section-title { font-size: 17px; margin: 28px 0 12px; }
+.section-title { font-size: 15px; font-weight: 600; margin: 32px 0 12px; display: flex; align-items: center; gap: 10px; }
+.section-title::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+table.list td, table.list th { white-space: nowrap; }
+table.list td:first-child { white-space: normal; }
+table.list th:not(:first-child):not(:nth-child(2)) { }
+.page-head .muted { margin-top: 4px; }
+.page-head h1 { font-size: 26px; }
 
 .feed { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
 .feed li { padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 14px; }

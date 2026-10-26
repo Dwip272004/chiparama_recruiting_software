@@ -88,10 +88,10 @@ export default function AdminDashboard() {
       {error && <div className="msg error">{error}</div>}
 
       <div className="kpis">
-        <div className={`kpi ${pending.length ? "alert" : ""}`} onClick={() => navigate("/jobs")}>
+        <div className={`kpi click ${pending.length ? "alert" : ""}`} onClick={() => navigate("/jobs")}>
           <div className="num">{pending.length}</div><div className="lbl">JDs awaiting review</div>
         </div>
-        <div className="kpi" onClick={() => navigate("/jobs")}>
+        <div className="kpi click" onClick={() => navigate("/jobs")}>
           <div className="num">{openJobs}</div><div className="lbl">Open / active jobs</div>
         </div>
         <div className="kpi">
