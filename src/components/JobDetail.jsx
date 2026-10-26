@@ -1,6 +1,7 @@
 import { useState } from "react";
 import StatusBadge from "./StatusBadge";
 import JobNotes from "./JobNotes";
+import CallingAssign from "./CallingAssign";
 
 const FIELDS = [
   ["client_name", "Client"],
@@ -118,6 +119,7 @@ export default function JobDetail({ job, statuses, canEdit, onSave, onManage }) 
           Candidates & outreach (RCS, Email, LinkedIn, Calling) →
         </button>
       )}
+      {onManage && !pending && <CallingAssign jobId={job.id} />}
       {pending && (
         <div className="msg info">
           New JD. Fill in the structured details, then change the status (for example to Open) to publish it.
