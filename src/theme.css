@@ -1,24 +1,27 @@
 /* Design tokens. Soft contrast, two themes, role accent colours. */
+/* Light = cool cream white (default). Dark = soft slate. */
 :root {
   color-scheme: light;
-  --bg: #f3f5f9; --panel: #ffffff; --border: #e1e5ed; --border-strong: #c9d0de;
-  --text: #263040; --muted: #667085; --raised: #eceff5; --hover: #f1f4fa;
-  --accent: #3b6fd4; --on-accent: #ffffff;
-  --accent-soft: color-mix(in srgb, var(--accent) 11%, var(--panel));
-  --danger: #d9485a; --ok: #1f9d55;
-  --shadow: 0 12px 36px rgba(30, 40, 70, .14);
-  --overlay: rgba(30, 38, 58, .38);
+  --bg: #f3f2ec; --panel: #fbfaf6; --border: #e5e2d9; --border-strong: #d2cec1;
+  --text: #212c37; --muted: #67717d; --raised: #ecebe4; --hover: #f0efe8;
+  --accent: #3566c8; --on-accent: #ffffff;
+  --accent-soft: color-mix(in srgb, var(--accent) 10%, var(--panel));
+  --danger: #c93a4d; --ok: #1d8a4e;
+  --shadow-sm: 0 1px 2px rgba(33, 44, 55, .05), 0 4px 14px rgba(33, 44, 55, .04);
+  --shadow: 0 14px 40px rgba(33, 44, 55, .14);
+  --overlay: rgba(33, 44, 55, .36);
+  --radius: 14px;
 
-  --gray-bg: #eceff4;   --gray-fg: #5a6478;
-  --blue-bg: #e3edff;   --blue-fg: #2f5fd0;
-  --green-bg: #ddf4e6;  --green-fg: #1a7f45;
-  --orange-bg: #ffeedd; --orange-fg: #b45a0f;
-  --amber-bg: #fff3cc;  --amber-fg: #8a6a05;
-  --purple-bg: #eee6ff; --purple-fg: #6b42c9;
-  --red-bg: #fde4e7;    --red-fg: #c0364a;
-  --amber-border: #e8cf7a;
-  --solid-gray: #b3bac9; --solid-blue: #5b8def; --solid-green: #3fb871; --solid-orange: #f0a04b;
-  --solid-amber: #e8c34a; --solid-purple: #9b7bea; --solid-red: #e5707f;
+  --gray-bg: #ebe9e2;   --gray-fg: #5b6570;
+  --blue-bg: #e0eafa;   --blue-fg: #2b5bbf;
+  --green-bg: #dcf0e3;  --green-fg: #1b7a46;
+  --orange-bg: #fbe8d4; --orange-fg: #a9560f;
+  --amber-bg: #f8edc4;  --amber-fg: #7f6006;
+  --purple-bg: #ece4fa; --purple-fg: #6444c0;
+  --red-bg: #fbdfe2;    --red-fg: #bb3446;
+  --amber-border: #e2cf88;
+  --solid-gray: #b9b8ae; --solid-blue: #5b8be0; --solid-green: #45b377; --solid-orange: #ee9f52;
+  --solid-amber: #e6c04c; --solid-purple: #9a7de6; --solid-red: #e06e7e;
 }
 html[data-theme="dark"] {
   color-scheme: dark;
@@ -26,6 +29,7 @@ html[data-theme="dark"] {
   --text: #d7dce6; --muted: #8c96a9; --raised: #252b39; --hover: #222836;
   --accent: #6c93e6;
   --danger: #f08a97; --ok: #6fd39a;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .25);
   --shadow: 0 16px 44px rgba(0, 0, 0, .5);
   --overlay: rgba(5, 8, 14, .6);
 
@@ -42,9 +46,9 @@ html[data-theme="dark"] {
   --solid-amber: #cdae45; --solid-purple: #8f78d6; --solid-red: #d46b79;
 }
 /* Role colours: Dwip violet, Admin blue, Hiring manager teal */
-html[data-theme="light"] [data-role="super_admin"] { --accent: #6d4fd6; }
+html[data-theme="light"] [data-role="super_admin"] { --accent: #6548d0; }
 html[data-theme="light"] [data-role="admin"] { --accent: #3b6fd4; }
-html[data-theme="light"] [data-role="recruiting_manager"] { --accent: #139484; }
+html[data-theme="light"] [data-role="recruiting_manager"] { --accent: #0f8d7d; }
 html[data-theme="dark"] [data-role="super_admin"] { --accent: #9a84ee; }
 html[data-theme="dark"] [data-role="admin"] { --accent: #6c93e6; }
 html[data-theme="dark"] [data-role="recruiting_manager"] { --accent: #4cc2b0; }

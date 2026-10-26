@@ -24,7 +24,7 @@ main.content { max-width: 1320px; width: 100%; margin: 0; padding: 24px 32px 48p
 }
 .icon-tool:hover, .icon-tool.on { background: var(--hover); color: var(--text); border-color: var(--border); }
 .dot-badge {
-  position: absolute; top: 3px; right: 2px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 999px;
+  position: absolute; top: -3px; right: -3px; min-width: 15px; height: 17px; padding: 0 4px; border-radius: 999px;
   background: var(--danger); color: var(--on-accent); font-size: 10px; font-weight: 700; display: grid; place-items: center; border: 2px solid var(--bg);
   box-sizing: content-box;
 }
@@ -77,7 +77,7 @@ body { line-height: 1.45; -webkit-font-smoothing: antialiased; }
 .primary { transition: filter .15s; }
 .primary:hover:not(:disabled) { filter: brightness(1.06); }
 .primary.sm { padding: 8px 14px; font-size: 14px; }
-.card { box-shadow: 0 1px 2px rgba(20, 30, 50, .04); }
+.card { box-shadow: var(--shadow-sm); }
 .avatar { background: var(--accent-soft); color: var(--accent); }
 input, textarea, select { background: var(--panel); }
 .count-pill { background: var(--raised); color: var(--muted); font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 999px; margin-left: 6px; text-transform: none; letter-spacing: 0; }
@@ -227,3 +227,41 @@ input, textarea, select { background: var(--panel); }
 .assign-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 .assign-actions .primary { padding: 10px 16px; font-size: 14px; }
 .ghost.danger { color: var(--red-fg); border-color: var(--red-fg); }
+
+/* ---------- Modern pass: cool cream surfaces, soft depth ---------- */
+body { font-size: 14.5px; font-feature-settings: "cv11", "ss01"; }
+h1, h2, h3 { letter-spacing: -.012em; }
+.page-head h1 { font-weight: 650; }
+.card, .kpi, .collapsible, .table-wrap, .tick, .assign-card, .fb-item, .login-card, .acct, .lot-cell, .runner, .email-preview, .lot-preview { border-radius: var(--radius); }
+.card, .kpi, .collapsible, .tick, .fb-item { box-shadow: var(--shadow-sm); }
+.table-wrap { box-shadow: var(--shadow-sm); }
+.modal, .popover, .drawer { box-shadow: var(--shadow); }
+.modal { border-radius: 18px; }
+
+.sidebar { background: color-mix(in srgb, var(--panel) 55%, var(--bg)); border-right-color: var(--border); }
+.sidebar nav a { border-radius: 10px; padding: 9px 12px; color: var(--muted); font-weight: 500; transition: background .12s, color .12s; }
+.sidebar nav a:hover { background: var(--hover); color: var(--text); }
+.sidebar nav a.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; box-shadow: inset 3px 0 0 var(--accent); }
+.appbar { background: color-mix(in srgb, var(--bg) 82%, transparent); }
+
+.primary { border-radius: 10px; box-shadow: 0 1px 2px color-mix(in srgb, var(--accent) 35%, transparent); font-weight: 600; }
+.ghost { border-radius: 10px; background: var(--panel); }
+.ghost:hover { background: var(--hover); border-color: var(--border-strong); }
+input, textarea, select { border-radius: 10px; border: 1px solid var(--border); transition: border-color .12s, box-shadow .12s; }
+input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
+.chip { background: var(--panel); border-color: var(--border); }
+.chip:hover { border-color: var(--border-strong); }
+
+table.list th { font-size: 11.5px; letter-spacing: .06em; background: color-mix(in srgb, var(--raised) 55%, var(--panel)); color: var(--muted); }
+table.list tbody tr:hover { background: var(--hover); }
+table.list td, table.list th { border-bottom-color: var(--border); }
+
+.kpi { padding: 16px 18px 15px; }
+.kpi .num, .tick-total, .ticker-total { font-variant-numeric: tabular-nums; letter-spacing: -.02em; font-weight: 650; }
+.kpi .lbl { font-size: 12.5px; letter-spacing: .01em; }
+
+.status { font-weight: 600; letter-spacing: .01em; }
+.hero { border: 1px solid var(--border); background: linear-gradient(120deg, var(--accent-soft), var(--panel) 65%); }
+.badge, .role-badge { border-radius: 999px; }
+.login-wrap { background: radial-gradient(1200px 500px at 50% -10%, color-mix(in srgb, var(--accent) 8%, transparent), transparent); }
+::selection { background: color-mix(in srgb, var(--accent) 25%, transparent); }

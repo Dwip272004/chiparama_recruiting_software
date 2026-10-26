@@ -10,6 +10,6 @@ export function applyTheme(t) {
 }
 export function initTheme() {
   const saved = read();
-  const t = saved === "dark" || saved === "light" ? saved : window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  const t = saved === "dark" ? "dark" : "light"; // cream light is the default
   document.documentElement.dataset.theme = t;
 }
