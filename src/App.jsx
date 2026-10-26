@@ -1,9 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./auth/AuthContext";
 import ProtectedRoute from "./auth/ProtectedRoute";
+import Layout from "./components/Layout";
 import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
+import Jobs from "./pages/Jobs";
 
 export default function App() {
   return (
@@ -13,13 +15,22 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route
-            path="/"
             element={
               <ProtectedRoute permission="dashboard.view">
-                <Dashboard />
+                <Layout />
               </ProtectedRoute>
             }
-          />
+          >
+            <Route path="/" element={<Dashboard />} />
+            <Route
+              path="/jobs/:jobCode?"
+              element={
+                <ProtectedRoute permission="jobs.view">
+                  <Jobs />
+                </ProtectedRoute>
+              }
+            />
+          </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AuthProvider>

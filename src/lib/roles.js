@@ -13,8 +13,11 @@ export const PERMISSIONS = {
   super_admin: ["*"],
   admin: [
     "dashboard.view",
+    "jobs.view",
+    "jobs.submit",
+    "jobs.review", // structure JDs, change status, edit job details
+    "jobs.statuses", // manage the list of statuses
     "candidates.manage",
-    "jobs.manage",
     "clients.manage",
     "outreach.manage",
     "reports.view",
@@ -23,8 +26,9 @@ export const PERMISSIONS = {
   ],
   recruiting_manager: [
     "dashboard.view",
+    "jobs.view",
+    "jobs.submit",
     "candidates.manage",
-    "jobs.manage",
     "outreach.manage",
     "reports.view",
   ],

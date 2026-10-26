@@ -1,41 +1,101 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
-import { ROLES } from "../lib/roles";
-
-const MODULES = [
-  { key: "candidates.manage", title: "Candidates", desc: "Sourcing, screening and pipeline" },
-  { key: "jobs.manage", title: "Jobs & Requisitions", desc: "Open reqs and JD management" },
-  { key: "outreach.manage", title: "Outreach", desc: "LinkedIn and email campaigns" },
-  { key: "clients.manage", title: "Clients", desc: "Client accounts and contacts" },
-  { key: "reports.view", title: "Reports", desc: "Recruiting performance" },
-  { key: "finance.view", title: "Finance", desc: "Invoicing and payments" },
-  { key: "users.view", title: "Team & Access", desc: "Who has access to what" },
-];
+import { fetchJobs, fetchStatuses, jobTitle } from "../lib/jobs";
+import StatusBadge from "../components/StatusBadge";
+import SubmitJD from "../components/SubmitJD";
 
 export default function Dashboard() {
-  const { profile, role, can, signOut } = useAuth();
-  const visible = MODULES.filter((m) => can(m.key));
+  const { profile, session, can } = useAuth();
+  const navigate = useNavigate();
+  const [jobs, setJobs] = useState([]);
+  const [statuses, setStatuses] = useState([]);
+  const [error, setError] = useState("");
+  const [justSubmitted, setJustSubmitted] = useState(null);
+
+  const load = async () => {
+    try {
+      const [j, s] = await Promise.all([fetchJobs(), fetchStatuses()]);
+      setJobs(j);
+      setStatuses(s);
+    } catch (e) {
+      setError(e.message);
+    }
+  };
+  useEffect(() => { load(); }, []);
+
+  const reviewer = can("jobs.review");
+  const pending = jobs.filter((j) => j.status === "pending_review");
+  const mine = jobs.filter((j) => j.submitted_by === session.user.id).slice(0, 8);
+  const counts = {};
+  jobs.forEach((j) => (counts[j.status] = (counts[j.status] ?? 0) + 1));
+
+  const JobRow = ({ j }) => (
+    <li onClick={() => navigate(`/jobs/${j.job_code}`)}>
+      <span className="mono">{j.job_code}</span>
+      <span className={j.title ? "" : "muted"}>{jobTitle(j)}</span>
+      <StatusBadge statusKey={j.status} statuses={statuses} />
+    </li>
+  );
 
   return (
-    <div className="app">
-      <header className="topbar">
-        <div className="brand">Chiparama</div>
-        <div className="who">
-          <span>{profile.full_name || profile.email}</span>
-          <span className="badge">{ROLES[role]?.label}</span>
-          <button className="link" onClick={signOut}>Sign out</button>
-        </div>
-      </header>
-      <main>
+    <div>
+      <div className="page-head">
         <h1>Welcome{profile.full_name ? `, ${profile.full_name.split(" ")[0]}` : ""}</h1>
-        <div className="grid">
-          {visible.map((m) => (
-            <div key={m.key} className="tile">
-              <h3>{m.title}</h3>
-              <p>{m.desc}</p>
+      </div>
+      {error && <div className="msg error">{error}</div>}
+
+      <div className="stat-row">
+        {statuses
+          .filter((s) => s.is_active || counts[s.key])
+          .map((s) => (
+            <div className="stat" key={s.key} onClick={() => navigate("/jobs")}>
+              <div className="num">{counts[s.key] ?? 0}</div>
+              <div className="lbl">{s.label}</div>
             </div>
           ))}
+      </div>
+
+      <div className="dash-grid">
+        {can("jobs.submit") && (
+          <section className="card">
+            <h3>Paste a job description</h3>
+            <p className="hint">The admins will review it and turn it into a structured job with a Job ID.</p>
+            {justSubmitted && (
+              <div className="msg ok">
+                Submitted as {justSubmitted.job_code}. The admins have it for review.
+              </div>
+            )}
+            <SubmitJD
+              onSubmitted={(job) => {
+                setJustSubmitted(job);
+                load();
+              }}
+            />
+          </section>
+        )}
+
+        <div className="stack">
+          {reviewer && (
+            <section className="card">
+              <h3>Awaiting review <span className="count">{pending.length}</span></h3>
+              {pending.length === 0 ? (
+                <div className="empty small">Nothing waiting.</div>
+              ) : (
+                <ul className="mini-list">{pending.map((j) => <JobRow key={j.id} j={j} />)}</ul>
+              )}
+            </section>
+          )}
+          <section className="card">
+            <h3>{reviewer ? "Recently submitted by you" : "Your submissions"}</h3>
+            {mine.length === 0 ? (
+              <div className="empty small">Nothing yet.</div>
+            ) : (
+              <ul className="mini-list">{mine.map((j) => <JobRow key={j.id} j={j} />)}</ul>
+            )}
+          </section>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
