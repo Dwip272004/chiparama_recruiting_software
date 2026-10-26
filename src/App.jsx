@@ -10,6 +10,7 @@ import JobCandidates from "./pages/JobCandidates";
 import CallingList from "./pages/CallingList";
 import CallProfile from "./pages/CallProfile";
 import Inmails from "./pages/Inmails";
+import Feedback from "./pages/Feedback";
 
 export default function App() {
   return (
@@ -47,6 +48,14 @@ export default function App() {
               element={
                 <ProtectedRoute permission="calling.view">
                   <CallingList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/feedback"
+              element={
+                <ProtectedRoute permission="feedback.submit">
+                  <Feedback />
                 </ProtectedRoute>
               }
             />

@@ -74,10 +74,10 @@ export default function ManagerDashboard() {
       </section>
 
       <div className="kpis">
-        <div className="kpi"><div className="num">{d.today.calls}</div><div className="lbl">Calls today</div></div>
-        <div className="kpi"><div className="num">{d.today.connected}</div><div className="lbl">Connected today</div></div>
+        <div className="kpi t-teal"><div className="num">{d.today.calls}</div><div className="lbl">Calls today</div></div>
+        <div className="kpi t-blue"><div className="num">{d.today.connected}</div><div className="lbl">Connected today</div></div>
         <div className="kpi good"><div className="num">{d.today.interested}</div><div className="lbl">Interested today</div></div>
-        <div className="kpi"><div className="num">{d.week_calls}</div><div className="lbl">Calls in last 7 days</div></div>
+        <div className="kpi t-purple"><div className="num">{d.week_calls}</div><div className="lbl">Calls in last 7 days</div></div>
       </div>
 
       <div className="dash-two">

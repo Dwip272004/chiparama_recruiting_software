@@ -4,7 +4,8 @@ import { useAuth } from "../auth/AuthContext";
 import { fetchNotifications, markRead, fetchActivityFeed } from "../lib/notifications";
 import { channelByKey, statusMeta, initials } from "../lib/outreach";
 import { timeAgo } from "../lib/dashboard";
-import { SendIcon, BellIcon, PulseIcon, FileIcon, UserPlusIcon, StarIcon, MsgIcon, CheckIcon, PhoneIcon } from "./Icons";
+import { currentTheme, applyTheme } from "../lib/theme";
+import { SunIcon, MoonIcon, ChatIcon, NoteIcon, SendIcon, BellIcon, PulseIcon, FileIcon, UserPlusIcon, StarIcon, MsgIcon, CheckIcon, PhoneIcon } from "./Icons";
 
 const TITLES = [
   [/^\/jobs\/[^/]+\/candidates/, "Job candidates"],
@@ -23,6 +24,9 @@ const NOTE_ICON = {
   inmail_request: [SendIcon, "amber"],
   inmail_sent: [SendIcon, "green"],
   inmail_skipped: [SendIcon, "gray"],
+  feedback_new: [ChatIcon, "purple"],
+  feedback_update: [ChatIcon, "green"],
+  job_note: [NoteIcon, "blue"],
 };
 
 function useOutside(ref, onClose) {
@@ -58,6 +62,8 @@ export default function TopBar() {
   const [feed, setFeed] = useState(null);
   const [err, setErr] = useState("");
   const wrap = useRef(null);
+  const [theme, setTheme] = useState(currentTheme());
+  const flip = () => { const t = theme === "dark" ? "light" : "dark"; applyTheme(t); setTheme(t); };
   const close = useCallback(() => setOpen(null), []);
   useOutside(wrap, close);
 
@@ -106,6 +112,9 @@ export default function TopBar() {
     <header className="appbar" ref={wrap}>
       <div className="appbar-title">{title}</div>
       <div className="appbar-actions">
+        <button className="icon-tool" onClick={flip} aria-label="Switch light/dark theme" title={theme === "dark" ? "Switch to light" : "Switch to dark"}>
+          {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+        </button>
         <div className="pop-anchor">
           <button className={`icon-tool ${open === "activity" ? "on" : ""}`} onClick={() => toggle("activity")} aria-label="Activity" title="Activity">
             <PulseIcon />

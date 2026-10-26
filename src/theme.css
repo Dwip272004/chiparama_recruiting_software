@@ -1,0 +1,50 @@
+/* Design tokens. Soft contrast, two themes, role accent colours. */
+:root {
+  color-scheme: light;
+  --bg: #f3f5f9; --panel: #ffffff; --border: #e1e5ed; --border-strong: #c9d0de;
+  --text: #263040; --muted: #667085; --raised: #eceff5; --hover: #f1f4fa;
+  --accent: #3b6fd4; --on-accent: #ffffff;
+  --accent-soft: color-mix(in srgb, var(--accent) 11%, var(--panel));
+  --danger: #d9485a; --ok: #1f9d55;
+  --shadow: 0 12px 36px rgba(30, 40, 70, .14);
+  --overlay: rgba(30, 38, 58, .38);
+
+  --gray-bg: #eceff4;   --gray-fg: #5a6478;
+  --blue-bg: #e3edff;   --blue-fg: #2f5fd0;
+  --green-bg: #ddf4e6;  --green-fg: #1a7f45;
+  --orange-bg: #ffeedd; --orange-fg: #b45a0f;
+  --amber-bg: #fff3cc;  --amber-fg: #8a6a05;
+  --purple-bg: #eee6ff; --purple-fg: #6b42c9;
+  --red-bg: #fde4e7;    --red-fg: #c0364a;
+  --amber-border: #e8cf7a;
+  --solid-gray: #b3bac9; --solid-blue: #5b8def; --solid-green: #3fb871; --solid-orange: #f0a04b;
+  --solid-amber: #e8c34a; --solid-purple: #9b7bea; --solid-red: #e5707f;
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #151922; --panel: #1c212c; --border: #2a3040; --border-strong: #3a4257;
+  --text: #d7dce6; --muted: #8c96a9; --raised: #252b39; --hover: #222836;
+  --accent: #6c93e6;
+  --danger: #f08a97; --ok: #6fd39a;
+  --shadow: 0 16px 44px rgba(0, 0, 0, .5);
+  --overlay: rgba(5, 8, 14, .6);
+
+  --gray-bg: #262c38;   --gray-fg: #a9b2c3;
+  --blue-bg: #1a2a4a;   --blue-fg: #86a9f2;
+  --green-bg: #15291f;  --green-fg: #6fd39a;
+  --orange-bg: #33241a; --orange-fg: #f0a863;
+  --amber-bg: #342c14;  --amber-fg: #e6c765;
+  --purple-bg: #272040; --purple-fg: #b79df0;
+  --red-bg: #36191e;    --red-fg: #f08a97;
+  --on-accent: #10141d;
+  --amber-border: #6f5d1f;
+  --solid-gray: #5b6477; --solid-blue: #5f86d8; --solid-green: #4fb883; --solid-orange: #d9944f;
+  --solid-amber: #cdae45; --solid-purple: #8f78d6; --solid-red: #d46b79;
+}
+/* Role colours: Dwip violet, Admin blue, Hiring manager teal */
+html[data-theme="light"] [data-role="super_admin"] { --accent: #6d4fd6; }
+html[data-theme="light"] [data-role="admin"] { --accent: #3b6fd4; }
+html[data-theme="light"] [data-role="recruiting_manager"] { --accent: #139484; }
+html[data-theme="dark"] [data-role="super_admin"] { --accent: #9a84ee; }
+html[data-theme="dark"] [data-role="admin"] { --accent: #6c93e6; }
+html[data-theme="dark"] [data-role="recruiting_manager"] { --accent: #4cc2b0; }

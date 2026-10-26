@@ -19,6 +19,7 @@ export const PERMISSIONS = {
     "jobs.statuses", // manage the list of statuses
     "candidates.manage", // upload lots, manage the 4 outreach channels
     "calling.view", // calling list (admins see every caller's list)
+    "feedback.submit", // feedback.manage is Dwip-only (via "*")
     "inmail.view",
     "inmail.request",
     "inmail.send", // only admins send (paid) LinkedIn InMails
@@ -33,6 +34,7 @@ export const PERMISSIONS = {
     "jobs.view",
     "jobs.submit",
     "calling.view", // recruiting managers only make calls
+    "feedback.submit",
     "inmail.view",
     "inmail.request", // ask the admins to send InMails
     "reports.view",

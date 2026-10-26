@@ -13,3 +13,7 @@ export const StarIcon = I(<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 
 export const CheckIcon = I(<path d="m5 12 5 5 9-10" />);
 export const MsgIcon = I(<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12" />);
 export const SendIcon = I(<><path d="M21 3 3 10.5l7 3 3 7z" /><path d="m10 13.5 4-4" /></>);
+export const SunIcon = I(<><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></>);
+export const MoonIcon = I(<path d="M21 13A9 9 0 1 1 11 3a7 7 0 0 0 10 10z" />);
+export const ChatIcon = I(<path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />);
+export const NoteIcon = I(<><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" /><path d="M14 3v6h6M8 13h8M8 17h5" /></>);

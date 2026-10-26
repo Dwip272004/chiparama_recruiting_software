@@ -91,16 +91,16 @@ export default function AdminDashboard() {
         <div className={`kpi click ${pending.length ? "alert" : ""}`} onClick={() => navigate("/jobs")}>
           <div className="num">{pending.length}</div><div className="lbl">JDs awaiting review</div>
         </div>
-        <div className="kpi click" onClick={() => navigate("/jobs")}>
+        <div className="kpi click t-blue" onClick={() => navigate("/jobs")}>
           <div className="num">{openJobs}</div><div className="lbl">Open / active jobs</div>
         </div>
-        <div className="kpi">
+        <div className="kpi t-purple">
           <div className="num">{d.totals.job_candidates}</div><div className="lbl">Candidates in pipelines</div>
         </div>
-        <div className="kpi">
+        <div className="kpi t-orange">
           <div className="num">{d.totals.unassigned_calls}</div><div className="lbl">Not yet assigned for calling</div>
         </div>
-        <div className="kpi">
+        <div className="kpi t-teal">
           <div className="num">{callsToday}</div><div className="lbl">Calls made today</div>
         </div>
         <div className="kpi good">

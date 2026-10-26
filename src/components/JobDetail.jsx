@@ -1,5 +1,6 @@
 import { useState } from "react";
 import StatusBadge from "./StatusBadge";
+import JobNotes from "./JobNotes";
 
 const FIELDS = [
   ["client_name", "Client"],
@@ -105,6 +106,7 @@ export default function JobDetail({ job, statuses, canEdit, onSave, onManage }) 
             <section key={k}><h4>{l}</h4><p className="pre">{job[k]}</p></section>
           ))}
         {rawBlock}
+        <JobNotes jobId={job.id} />
       </div>
     );
   }
@@ -150,6 +152,8 @@ export default function JobDetail({ job, statuses, canEdit, onSave, onManage }) 
       {TEXTAREAS.map(([k, l]) => (
         <label key={k}>{l}<textarea rows={k === "summary" ? 3 : 6} value={form[k]} onChange={set(k)} /></label>
       ))}
+
+      <JobNotes jobId={job.id} />
 
       {error && <div className="msg error">{error}</div>}
       {saved && <div className="msg ok">Saved.</div>}
