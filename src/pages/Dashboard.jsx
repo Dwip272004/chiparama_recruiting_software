@@ -30,7 +30,7 @@ export default function Dashboard() {
     fetchCallList()
       .then((rows) => {
         const b = rows.map(callBucket);
-        setCallQueue({ todo: b.filter((x) => x === "new" || x === "retry").length, due: b.filter((x) => x === "followup").length });
+        setCallQueue({ todo: b.filter((x) => x === "new").length, retry: b.filter((x) => x === "retry" || x === "callback").length });
       })
       .catch(() => {});
     // eslint-disable-next-line
@@ -95,7 +95,7 @@ export default function Dashboard() {
                 <div className="empty small">Loading…</div>
               ) : (
                 <div className="muted">
-                  <b>{callQueue.todo}</b> to call · <b className={callQueue.due ? "due" : ""}>{callQueue.due}</b> follow-ups due
+                  <b>{callQueue.todo}</b> not called yet · <b>{callQueue.retry}</b> to retry
                 </div>
               )}
               <button className="primary" onClick={() => navigate("/calling")}>Open calling list</button>

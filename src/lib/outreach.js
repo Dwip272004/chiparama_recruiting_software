@@ -41,15 +41,31 @@ export const channelByKey = (key) => CHANNELS.find((c) => c.key === key);
 export const RETRY = ["no_answer", "voicemail", "busy"];
 export function callBucket(row) {
   const s = row.call_status;
-  const due = row.next_follow_up_at && new Date(row.next_follow_up_at) <= new Date();
-  if (s === "not_called") return due ? "followup" : "new";
-  if (RETRY.includes(s) || s === "call_back_later") return due ? "followup" : "retry";
+  if (s === "not_called") return "new";
+  if (s === "call_back_later") return "callback";
+  if (RETRY.includes(s)) return "retry";
   return "done";
 }
+
+// Calling order: callbacks first, then never-called, then retries (longest since last attempt first)
+export const BUCKET_ORDER = { callback: 0, new: 1, retry: 2, done: 3 };
+export function sortForCalling(a, b) {
+  const d = BUCKET_ORDER[callBucket(a)] - BUCKET_ORDER[callBucket(b)];
+  if (d) return d;
+  const ta = a.last_called_at ? new Date(a.last_called_at).getTime() : 0;
+  const tb = b.last_called_at ? new Date(b.last_called_at).getTime() : 0;
+  return ta - tb;
+}
+
+export const initials = (name = "") =>
+  name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join("");
 
 /* ---------- Data access ---------- */
 
 const JC_SELECT = "*, candidate:candidates(*), batch:candidate_batches(id,tag)";
+const CALL_SELECT =
+  "*, candidate:candidates(*), batch:candidate_batches(id,tag), " +
+  "job:jobs(job_code,title,client_name,location,work_mode,employment_type,experience,compensation,openings,skills,summary,responsibilities,requirements)";
 
 async function fetchAll(build) {
   const size = 1000;
@@ -95,7 +111,7 @@ export const fetchCallList = () =>
   fetchAll(() =>
     supabase
       .from("job_candidates")
-      .select("*, candidate:candidates(*), batch:candidate_batches(id,tag), job:jobs(job_code,title,client_name)")
+      .select(CALL_SELECT)
       .not("call_assigned_to", "is", null)
       .order("created_at", { ascending: false })
       .order("id")
@@ -183,17 +199,16 @@ export async function addToBatch(batchId, rows) {
   return total;
 }
 
-export async function logCall(id, status, note, followUpIso) {
+export async function logCall(id, status, note) {
   const { error } = await supabase.rpc("log_call", {
     p_id: id,
     p_status: status,
     p_note: note || null,
-    p_follow_up: followUpIso || null,
   });
   if (error) throw error;
   const { data, error: e2 } = await supabase
     .from("job_candidates")
-    .select("*, candidate:candidates(*), batch:candidate_batches(id,tag), job:jobs(job_code,title,client_name)")
+    .select(CALL_SELECT)
     .eq("id", id)
     .single();
   if (e2) throw e2;

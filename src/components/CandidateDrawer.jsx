@@ -95,7 +95,6 @@ export default function CandidateDrawer({ row, callers, onChannel, onAssign, onS
         {(row.call_attempts > 0 || row.call_notes) && (
           <div className="callbox">
             <div>Call attempts: <b>{row.call_attempts}</b> · Last called: {fmtDateTime(row.last_called_at)}</div>
-            {row.next_follow_up_at && <div>Follow-up: {fmtDateTime(row.next_follow_up_at)}</div>}
             {row.call_notes && <div className="pre">Latest note: {row.call_notes}</div>}
           </div>
         )}

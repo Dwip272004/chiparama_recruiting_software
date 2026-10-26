@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import Jobs from "./pages/Jobs";
 import JobCandidates from "./pages/JobCandidates";
 import CallingList from "./pages/CallingList";
+import CallProfile from "./pages/CallProfile";
 
 export default function App() {
   return (
@@ -29,6 +30,14 @@ export default function App() {
               element={
                 <ProtectedRoute permission="candidates.manage">
                   <JobCandidates />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/calling/:rowId"
+              element={
+                <ProtectedRoute permission="calling.view">
+                  <CallProfile />
                 </ProtectedRoute>
               }
             />
