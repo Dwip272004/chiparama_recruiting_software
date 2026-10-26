@@ -7,7 +7,9 @@ const FIELDS = [
   ["work_mode", "Work mode (Onsite / Hybrid / Remote)"],
   ["employment_type", "Employment type (Full-time / Contract)"],
   ["experience", "Experience"],
-  ["compensation", "Compensation / rate"],
+  ["compensation", "Salary / compensation"],
+  ["pay_rate", "Pay rate (e.g. $70/hr)"],
+  ["bill_rate", "Bill rate (e.g. $90/hr)"],
 ];
 const TEXTAREAS = [
   ["summary", "Summary"],
