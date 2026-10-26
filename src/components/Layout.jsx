@@ -3,7 +3,7 @@ import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { ROLES } from "../lib/roles";
 import TopBar from "./TopBar";
-import { GridIcon, BriefcaseIcon, PhoneIcon, LogoutIcon, SendIcon, ChatIcon } from "./Icons";
+import { GridIcon, BriefcaseIcon, PhoneIcon, LogoutIcon, SendIcon, ChatIcon, MailIcon } from "./Icons";
 import { fetchInmailPendingCount } from "../lib/inmail";
 import { fetchNewFeedbackCount } from "../lib/feedback";
 import "../jobs.css";
@@ -13,6 +13,7 @@ const NAV = [
   { to: "/", label: "Dashboard", perm: "dashboard.view", end: true, Icon: GridIcon },
   { to: "/jobs", label: "Jobs", perm: "jobs.view", Icon: BriefcaseIcon },
   { to: "/calling", label: "Calling list", perm: "calling.view", Icon: PhoneIcon },
+  { to: "/email", label: "Email outreach", perm: "email.manage", Icon: MailIcon },
   { to: "/inmails", label: "InMails", perm: "inmail.view", Icon: SendIcon, badge: "inmail" },
   { to: "/feedback", label: "Feedback", perm: "feedback.submit", Icon: ChatIcon, badge: "feedback" },
 ];
