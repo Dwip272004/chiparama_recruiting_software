@@ -162,3 +162,25 @@ input, textarea, select { background: var(--panel); }
 .ch-cell { min-width: 120px; display: flex; flex-direction: column; gap: 2px; }
 .ch-cell .progress { margin: 2px 0; }
 .ch-sub { white-space: nowrap; }
+
+/* Collapsible dropdown panels */
+.coll-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; align-items: start; margin-bottom: 8px; }
+@media (max-width: 900px) { .coll-row { grid-template-columns: 1fr; } }
+.collapsible { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.collapsible.tone-amber { border-left: 3px solid var(--solid-amber); }
+.collapsible.tone-blue { border-left: 3px solid var(--solid-blue); }
+.coll-head { width: 100%; display: flex; align-items: center; gap: 10px; padding: 11px 14px; background: transparent; border: 0; color: var(--text); font: inherit; cursor: pointer; text-align: left; }
+.coll-head:hover { background: var(--hover); }
+.coll-title { font-weight: 600; font-size: 14px; white-space: nowrap; }
+.coll-count { background: var(--raised); color: var(--muted); font-size: 12px; font-weight: 700; padding: 1px 8px; border-radius: 999px; }
+.tone-amber .coll-count.has { background: var(--amber-bg); color: var(--amber-fg); }
+.tone-blue .coll-count.has { background: var(--blue-bg); color: var(--blue-fg); }
+.coll-preview { flex: 1; min-width: 0; color: var(--muted); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.coll-chev { margin-left: auto; color: var(--muted); transition: transform .15s; flex: none; }
+.collapsible.open .coll-chev { transform: rotate(180deg); }
+.coll-body { border-top: 1px solid var(--border); padding: 4px 8px 8px; }
+.coll-body .scroll { max-height: 320px; overflow-y: auto; }
+.mini-list.compact li { padding: 8px 6px; }
+.feed.compact li { padding: 7px 6px; }
+.feed-line { display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+.dash-two > .collapsible { align-self: start; }

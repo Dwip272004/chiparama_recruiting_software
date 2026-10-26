@@ -5,6 +5,7 @@ import StatusBadge from "../../components/StatusBadge";
 import { fetchStatuses, fetchJobs, jobTitle } from "../../lib/jobs";
 import { fetchAdminDashboard, fetchSourcing, timeAgo, pct } from "../../lib/dashboard";
 import SourcingBoard from "../../components/SourcingBoard";
+import Collapsible from "../../components/Collapsible";
 import { CHANNELS, statusOptions, statusMeta, channelByKey } from "../../lib/outreach";
 import "../../dashboard.css";
 
@@ -111,17 +112,14 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      <h2 className="section-title">Sourcing</h2>
-      <SourcingBoard jobs={sourcing} />
-
-      <div className="dash-two" style={{ marginTop: 24 }}>
-        <section className="card">
-          <h3>Awaiting review <span className="count">{pending.length}</span></h3>
+      <div className="coll-row">
+        <Collapsible id="awaiting" title="Awaiting review" count={pending.length} tone="amber"
+          preview={pending[0] ? `${pending[0].job_code} · ${jobTitle(pending[0])}` : "Nothing waiting"}>
           {pending.length === 0 ? (
-            <div className="empty small">Nothing waiting. 🎉</div>
+            <div className="empty small">Nothing waiting.</div>
           ) : (
-            <ul className="mini-list">
-              {pending.slice(0, 6).map((j) => (
+            <ul className="mini-list compact">
+              {pending.map((j) => (
                 <li key={j.id} onClick={() => navigate(`/jobs/${j.job_code}`)}>
                   <span className="mono">{j.job_code}</span>
                   <span>{jobTitle(j)}</span>
@@ -130,24 +128,27 @@ export default function AdminDashboard() {
               ))}
             </ul>
           )}
-        </section>
+        </Collapsible>
 
-        <section className="card">
-          <h3>Recent activity</h3>
+        <Collapsible id="activity" title="Recent activity" count={d.recent.length} tone="blue"
+          preview={d.recent[0] ? `${d.recent[0].actor_name ?? "System"} · ${d.recent[0].candidate} · ${timeAgo(d.recent[0].created_at)}` : "No activity yet"}>
           {d.recent.length === 0 ? (
             <div className="empty small">No outreach activity yet.</div>
           ) : (
-            <ul className="feed">
+            <ul className="feed compact scroll">
               {d.recent.map((a) => (
                 <li key={a.id}>
-                  <div><b>{a.actor_name ?? "System"}</b> · {a.candidate}</div>
-                  <div className="muted small">{describe(a)} · {a.job_code} · {timeAgo(a.created_at)}</div>
+                  <div className="feed-line"><b>{a.actor_name ?? "System"}</b> · {a.candidate}<span className="muted small">{timeAgo(a.created_at)}</span></div>
+                  <div className="muted small">{describe(a)} · {a.job_code}</div>
                 </li>
               ))}
             </ul>
           )}
-        </section>
+        </Collapsible>
       </div>
+
+      <h2 className="section-title">Sourcing</h2>
+      <SourcingBoard jobs={sourcing} />
 
       <h2 className="section-title">Outreach funnel (all jobs)</h2>
       <div className="funnel-grid">

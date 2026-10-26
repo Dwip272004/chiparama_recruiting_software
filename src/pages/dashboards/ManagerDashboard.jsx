@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import StatusBadge from "../../components/StatusBadge";
 import SubmitJD from "../../components/SubmitJD";
+import Collapsible from "../../components/Collapsible";
 import { StatusPill } from "../../components/StatusSelect";
 import { fetchStatuses, fetchJobs, jobTitle } from "../../lib/jobs";
 import { fetchMyDashboard, timeAgo, pct } from "../../lib/dashboard";
@@ -99,24 +100,21 @@ export default function ManagerDashboard() {
           )}
         </section>
 
-        <section className="card">
-          <h3>Your recent calls</h3>
+        <Collapsible id="my-calls" title="Your recent calls" count={d.recent.length} tone="blue"
+          preview={d.recent[0] ? `${d.recent[0].candidate} · ${timeAgo(d.recent[0].created_at)}` : "No calls logged yet"}>
           {d.recent.length === 0 ? (
             <div className="empty small">No calls logged yet.</div>
           ) : (
-            <ul className="feed">
+            <ul className="feed compact scroll">
               {d.recent.map((a) => (
                 <li key={a.id}>
-                  <div className="row-between">
-                    <b>{a.candidate}</b>
-                    <StatusPill channel="call" value={a.to_status} />
-                  </div>
+                  <div className="feed-line"><b>{a.candidate}</b><StatusPill channel="call" value={a.to_status} /></div>
                   <div className="muted small">{a.job_code} · {timeAgo(a.created_at)}{a.note ? ` · ${a.note.slice(0, 70)}` : ""}</div>
                 </li>
               ))}
             </ul>
           )}
-        </section>
+        </Collapsible>
       </div>
 
       <h2 className="section-title">Open roles</h2>
