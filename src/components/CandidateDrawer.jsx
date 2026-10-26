@@ -4,12 +4,17 @@ import { CHANNELS, fetchActivity, statusMeta, channelByKey, fmtDateTime } from "
 
 const FIELDS = [
   ["full_name", "Name"],
-  ["email", "Email"],
-  ["phone", "Phone"],
+  ["email", "Email (work)"],
+  ["alt_email", "Email (personal)"],
+  ["phone", "Phone 1"],
+  ["phone_2", "Phone 2"],
+  ["phone_3", "Phone 3"],
   ["linkedin_url", "LinkedIn URL"],
+  ["recruiter_profile_url", "Recruiter profile link"],
   ["current_title", "Current title"],
   ["current_company", "Current company"],
   ["location", "Location"],
+  ["experience_years", "Experience (years)"],
 ];
 
 // Admin view of one candidate on one job: details, 4 channel statuses, caller, history.
@@ -18,6 +23,7 @@ export default function CandidateDrawer({ row, callers, onChannel, onAssign, onS
   const [form, setForm] = useState(() => ({
     ...Object.fromEntries(FIELDS.map(([k]) => [k, c[k] ?? ""])),
     notes: c.notes ?? "",
+    open_to_work: c.open_to_work === true ? "yes" : c.open_to_work === false ? "no" : "",
   }));
   const [activity, setActivity] = useState([]);
   const [busy, setBusy] = useState(false);
@@ -38,6 +44,13 @@ export default function CandidateDrawer({ row, callers, onChannel, onAssign, onS
       const patch = Object.fromEntries(FIELDS.map(([k]) => [k, form[k].trim() || null]));
       if (!patch.full_name) throw new Error("Name is required.");
       if (patch.email) patch.email = patch.email.toLowerCase();
+      if (patch.alt_email) patch.alt_email = patch.alt_email.toLowerCase();
+      if (patch.experience_years !== null) {
+        const n = Number(patch.experience_years);
+        if (Number.isNaN(n) || n < 0 || n >= 100) throw new Error("Experience must be a number of years.");
+        patch.experience_years = n;
+      }
+      patch.open_to_work = form.open_to_work === "yes" ? true : form.open_to_work === "no" ? false : null;
       patch.notes = form.notes.trim() || null;
       await onSaveCandidate(patch);
       setMsg({ type: "ok", text: "Saved." });
@@ -94,6 +107,14 @@ export default function CandidateDrawer({ row, callers, onChannel, onAssign, onS
           {FIELDS.map(([k, l]) => (
             <label key={k}>{l}<input value={form[k]} onChange={set(k)} /></label>
           ))}
+          <label>
+            Open to work
+            <select value={form.open_to_work} onChange={set("open_to_work")}>
+              <option value="">Unknown</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </label>
         </div>
         <label>Notes<textarea rows={3} value={form.notes} onChange={set("notes")} /></label>
         {msg.text && <div className={`msg ${msg.type}`}>{msg.text}</div>}

@@ -236,8 +236,14 @@ const ALIASES = {
   full_name: ["name", "full name", "full_name", "candidate", "candidate name"],
   first_name: ["first name", "first_name", "firstname"],
   last_name: ["last name", "last_name", "lastname", "surname"],
-  email: ["email", "email address", "e-mail", "mail", "work email", "personal email"],
-  phone: ["phone", "mobile", "phone number", "contact", "contact number", "mobile number", "cell"],
+  email: ["work email", "email", "email address", "e-mail", "mail"],
+  alt_email: ["personal email", "alternate email", "alt email", "email 2", "other email"],
+  phone: ["direct phone 1", "direct phone", "phone 1", "phone", "mobile", "phone number", "contact", "contact number", "mobile number", "cell"],
+  phone_2: ["phone 2", "direct phone 2", "alternate phone", "mobile 2"],
+  phone_3: ["phone 3", "direct phone 3", "mobile 3"],
+  recruiter_profile_url: ["recruiter profile", "recruiter profile url", "linkedin recruiter", "recruiter link"],
+  open_to_work: ["open to work", "open_to_work", "opentowork"],
+  experience_years: ["experience years", "experience", "years of experience", "yoe", "total experience"],
   linkedin_url: ["linkedin", "linkedin url", "linkedin_url", "profile", "profile url", "linkedin profile", "linkedin link"],
   current_title: ["title", "current title", "designation", "job title", "position", "headline"],
   current_company: ["company", "current company", "employer", "organization", "organisation"],
@@ -250,7 +256,7 @@ const liKey = (s) =>
 
 export function mapTable(table) {
   if (table.length < 2) return { rows: [], valid: [], invalid: [], dupes: 0, recognised: [], ignored: [] };
-  const header = table[0].map((h) => h.trim().toLowerCase());
+  const header = table[0].map((h) => h.replace(/^﻿/, "").trim().toLowerCase());
   const idx = {};
   const recognised = [];
   Object.entries(ALIASES).forEach(([field, names]) => {
@@ -268,23 +274,52 @@ export function mapTable(table) {
     const r = {
       full_name: get("full_name") || [get("first_name"), get("last_name")].filter(Boolean).join(" "),
       email: get("email").toLowerCase(),
+      alt_email: get("alt_email").toLowerCase(),
       phone: get("phone"),
+      phone_2: get("phone_2"),
+      phone_3: get("phone_3"),
       linkedin_url: get("linkedin_url"),
+      recruiter_profile_url: get("recruiter_profile_url"),
       current_title: get("current_title"),
       current_company: get("current_company"),
       location: get("location"),
+      open_to_work: get("open_to_work"),
+      experience_years: get("experience_years"),
     };
+    // If only a personal email is given, use it as the main email
+    if (!r.email && r.alt_email) { r.email = r.alt_email; r.alt_email = ""; }
+    // Fill empty phone slots in order so "phone 1" can be blank
+    const phones = [r.phone, r.phone_2, r.phone_3].filter(Boolean);
+    [r.phone, r.phone_2, r.phone_3] = [phones[0] ?? "", phones[1] ?? "", phones[2] ?? ""];
     const line = n + 2;
     if (!r.full_name) return invalid.push({ line, reason: "No name" });
-    if (!r.email && !r.linkedin_url && digits(r.phone).length < 7)
-      return invalid.push({ line, name: r.full_name, reason: "No email, LinkedIn or phone" });
-    const keys = [r.email && `e:${r.email}`, r.linkedin_url && `l:${liKey(r.linkedin_url)}`,
+    if (!r.email && !r.linkedin_url && !r.recruiter_profile_url && digits(r.phone).length < 7)
+      return invalid.push({ line, name: r.full_name, reason: "No phone, email or profile link" });
+    const keys = [r.email && `e:${r.email}`, r.alt_email && `e:${r.alt_email}`,
+      r.linkedin_url && `l:${liKey(r.linkedin_url)}`,
+      r.recruiter_profile_url && `r:${r.recruiter_profile_url.toLowerCase()}`,
       digits(r.phone).length >= 7 && `p:${digits(r.phone)}`].filter(Boolean);
     if (keys.some((k) => seen.has(k))) { dupes++; return; }
     keys.forEach((k) => seen.add(k));
     valid.push(r);
   });
   return { valid, invalid, dupes, recognised, ignored };
+}
+
+export const TEMPLATE_HEADERS = [
+  "name", "current title", "company", "location", "open to work", "experience years",
+  "Direct phone 1", "phone 2", "phone 3", "work email", "personal email", "recruiter profile",
+];
+export function downloadTemplate() {
+  const sample = ["Asha Rao", "Senior DFT Engineer", "Broadcom", "Bangalore", "Yes", "8",
+    "+919876543210", "", "", "asha.rao@company.com", "asha.rao@gmail.com", "https://www.linkedin.com/talent/profile/…"];
+  const csv = [TEMPLATE_HEADERS, sample].map((r) => r.map((c) => `"${c}"`).join(",")).join("\n");
+  const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "outreach-list-template.csv";
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 export const fmtDateTime = (d) =>

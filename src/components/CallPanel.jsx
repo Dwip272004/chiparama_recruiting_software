@@ -43,8 +43,20 @@ export default function CallPanel({ row, onSaved, onNext, hasNext }) {
         ) : (
           <span className="muted">No phone number</span>
         )}
+        {[c.phone_2, c.phone_3].filter(Boolean).length > 0 && (
+          <div className="contact-links">
+            <span className="muted">Other numbers:</span>
+            {[c.phone_2, c.phone_3].filter(Boolean).map((p) => (
+              <a key={p} href={`tel:${p.replace(/[^\d+]/g, "")}`}>{p}</a>
+            ))}
+          </div>
+        )}
         <div className="contact-links">
           {c.email && <a href={`mailto:${c.email}`}>{c.email}</a>}
+          {c.alt_email && <a href={`mailto:${c.alt_email}`}>{c.alt_email}</a>}
+          {c.recruiter_profile_url && (
+            <a href={c.recruiter_profile_url} target="_blank" rel="noreferrer">Recruiter profile ↗</a>
+          )}
           {c.linkedin_url && (
             <a href={c.linkedin_url.startsWith("http") ? c.linkedin_url : `https://${c.linkedin_url}`} target="_blank" rel="noreferrer">
               LinkedIn profile ↗
@@ -52,7 +64,10 @@ export default function CallPanel({ row, onSaved, onNext, hasNext }) {
           )}
         </div>
         <div className="muted small">
-          {[c.current_title, c.current_company, c.location].filter(Boolean).join(" · ")}
+          {[c.current_title, c.current_company, c.location,
+            c.experience_years != null ? `${c.experience_years} yrs exp` : null,
+            c.open_to_work === true ? "Open to work" : c.open_to_work === false ? "Not open to work" : null]
+            .filter(Boolean).join(" · ")}
         </div>
       </div>
 

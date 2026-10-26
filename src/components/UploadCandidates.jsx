@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { parseDelimited, mapTable, createBatch, addToBatch } from "../lib/outreach";
+import { parseDelimited, mapTable, createBatch, addToBatch, downloadTemplate } from "../lib/outreach";
 
 const today = () => new Date().toLocaleDateString(undefined, { day: "numeric", month: "short" });
 
@@ -88,12 +88,12 @@ export default function UploadCandidates({ job, batches, onDone }) {
         rows={8}
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder={"name,email,phone,linkedin,title,company,location\nAsha Rao,asha@x.com,+91 98xxxxxx,linkedin.com/in/asha,DFT Lead,Acme,Bengaluru"}
+        placeholder={"name,current title,company,location,open to work,experience years,Direct phone 1,phone 2,phone 3,work email,personal email,recruiter profile"}
       />
       <div className="hint">
-        First row must be headers. Recognised: name (or first/last name), email, phone, linkedin, title, company, location.
-        Each row needs a name and at least one of email, LinkedIn or phone. People already in your database are matched
-        by email, then LinkedIn, then phone, so nobody is duplicated.
+        Use the outreach list template: <button type="button" className="link" onClick={downloadTemplate}>download it here</button>.
+        First row must be headers. Each row needs a name and at least one of phone, email or a profile link. People already
+        in your database are matched by email, recruiter profile, LinkedIn or phone, so nobody is duplicated across jobs.
       </div>
 
       {parsed && (
