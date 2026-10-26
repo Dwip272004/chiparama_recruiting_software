@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import StatusBadge from "../../components/StatusBadge";
 import { fetchStatuses, fetchJobs, jobTitle } from "../../lib/jobs";
-import { fetchAdminDashboard, timeAgo, pct } from "../../lib/dashboard";
+import { fetchAdminDashboard, fetchSourcing, timeAgo, pct } from "../../lib/dashboard";
+import SourcingBoard from "../../components/SourcingBoard";
 import { CHANNELS, statusOptions, statusMeta, channelByKey } from "../../lib/outreach";
 import "../../dashboard.css";
 
@@ -40,11 +41,13 @@ export default function AdminDashboard() {
   const [pending, setPending] = useState([]);
   const [error, setError] = useState("");
   const [updated, setUpdated] = useState(null);
+  const [sourcing, setSourcing] = useState([]);
 
   const load = useCallback(async () => {
     try {
       const [dash, st, jobs] = await Promise.all([fetchAdminDashboard(), fetchStatuses(), fetchJobs()]);
       setD(dash);
+      fetchSourcing().then(setSourcing).catch(() => {});
       setStatuses(st);
       setPending(jobs.filter((j) => j.status === "pending_review"));
       setUpdated(new Date());
@@ -108,7 +111,10 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      <div className="dash-two">
+      <h2 className="section-title">Sourcing</h2>
+      <SourcingBoard jobs={sourcing} />
+
+      <div className="dash-two" style={{ marginTop: 24 }}>
         <section className="card">
           <h3>Awaiting review <span className="count">{pending.length}</span></h3>
           {pending.length === 0 ? (

@@ -30,3 +30,9 @@ export const timeAgo = (iso) => {
 };
 
 export const pct = (a, b) => (b ? Math.round((a / b) * 100) : 0);
+
+export async function fetchSourcing() {
+  const { data, error } = await supabase.rpc("sourcing_dashboard", { p_day_start: dayStartIso() });
+  if (error) throw error;
+  return data ?? [];
+}
