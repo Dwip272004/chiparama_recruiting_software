@@ -1,0 +1,27 @@
+.pos-filters { align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.pos-search { flex: 1 1 240px; min-width: 200px; max-width: 360px; }
+.pos-table tbody tr { cursor: pointer; }
+.pos-table td:first-child { min-width: 220px; }
+.pos-table td { white-space: nowrap; }
+.pos-table tr.prio-row td:first-child { box-shadow: inset 3px 0 0 var(--solid-orange); }
+.pos-table tr.prio-urgent td:first-child { box-shadow: inset 3px 0 0 var(--solid-red); }
+.pos-detail { display: flex; flex-direction: column; gap: 14px; }
+.pos-detail h4 { margin: 8px 0 0; font-size: 14px; }
+.pos-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+.pos-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 18px; margin: 0; }
+.pos-facts dt { color: var(--muted); font-size: 12px; margin-bottom: 2px; }
+.pos-facts dd { margin: 0; font-size: 14px; }
+.pos-jd { background: var(--raised); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; max-height: 320px; overflow: auto; }
+.pos-box { border: 1px solid var(--border); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; background: var(--panel); }
+.pos-prio-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.pos-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+button.danger { color: var(--red-fg); }
+.pos-form { display: flex; flex-direction: column; gap: 12px; }
+.pos-log { list-style: none; margin: 0; padding: 0 0 0 14px; border-left: 2px solid var(--border); display: flex; flex-direction: column; gap: 12px; }
+.pos-log li { position: relative; }
+.pos-log li::before { content: ""; position: absolute; left: -20px; top: 5px; width: 10px; height: 10px; border-radius: 50%; background: var(--solid-gray); border: 2px solid var(--panel); }
+.pos-log li.act-added::before, .pos-log li.act-restored::before { background: var(--solid-green); }
+.pos-log li.act-removed::before { background: var(--solid-red); }
+.pos-log li.act-priority::before { background: var(--solid-orange); }
+.pos-log li.act-edited::before { background: var(--solid-blue); }
+.pos-note { margin-top: 2px; font-style: italic; }

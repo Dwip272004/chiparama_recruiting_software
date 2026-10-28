@@ -19,6 +19,8 @@ export const PERMISSIONS = {
     "jobs.statuses", // manage the list of statuses
     "candidates.manage", // upload lots, manage the 4 outreach channels
     "calling.view", // calling list (admins see every caller's list)
+    "positions.view",
+    "positions.priority", // only admins set position priority
     "feedback.submit", // feedback.manage is Dwip-only (via "*")
     "inmail.view",
     "inmail.request",
@@ -34,6 +36,7 @@ export const PERMISSIONS = {
     "jobs.view",
     "jobs.submit",
     "calling.view", // recruiting managers only make calls
+    "positions.view", // edit rights are granted per-user in the database
     "feedback.submit",
     "inmail.view",
     "inmail.request", // ask the admins to send InMails

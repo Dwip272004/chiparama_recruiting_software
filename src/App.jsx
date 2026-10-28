@@ -12,6 +12,7 @@ import CallProfile from "./pages/CallProfile";
 import Inmails from "./pages/Inmails";
 import Feedback from "./pages/Feedback";
 import EmailOutreach from "./pages/EmailOutreach";
+import Positions from "./pages/Positions";
 
 export default function App() {
   return (
@@ -49,6 +50,14 @@ export default function App() {
               element={
                 <ProtectedRoute permission="calling.view">
                   <CallingList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/positions"
+              element={
+                <ProtectedRoute permission="positions.view">
+                  <Positions />
                 </ProtectedRoute>
               }
             />
