@@ -121,3 +121,9 @@ table.list input[type="checkbox"] { width: auto; }
 .inline-check input { width: auto; }
 .nav-badge { margin-left: auto; background: var(--amber-bg); color: var(--amber-fg); font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 999px; }
 .status.status-amber { background: var(--amber-bg); color: var(--amber-fg); }
+
+.lot-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: -4px 0 12px; }
+.lot-del-opts { display: flex; flex-direction: column; gap: 10px; margin: 14px 0; }
+.lot-del-opts button { text-align: left; display: flex; flex-direction: column; gap: 4px; align-items: flex-start; padding: 12px 14px; }
+.lot-del-opts button.danger b { color: var(--red-fg); }
+button.danger { color: var(--red-fg); }

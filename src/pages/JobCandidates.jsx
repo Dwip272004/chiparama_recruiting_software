@@ -8,7 +8,7 @@ import CandidateDrawer from "../components/CandidateDrawer";
 import { fetchStatuses } from "../lib/jobs";
 import {
   CHANNELS, statusOptions, statusMeta, fetchJobByCode, fetchBatches, fetchJobCandidates, fetchCallers,
-  updateJobCandidate, bulkUpdateIds, bulkUpdateBatch, removeFromJob, updateCandidate,
+  updateJobCandidate, bulkUpdateIds, bulkUpdateBatch, removeFromJob, updateCandidate, deleteLot,
 } from "../lib/outreach";
 import "../outreach.css";
 
@@ -22,6 +22,8 @@ export default function JobCandidates() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [lotDel, setLotDel] = useState(null); // lot being deleted
+  const [lotBusy, setLotBusy] = useState(false);
 
   const [batchFilter, setBatchFilter] = useState("all");
   const [q, setQ] = useState("");
@@ -80,6 +82,20 @@ export default function JobCandidates() {
   const activeBatch = batches.find((b) => b.id === batchFilter);
   const scopeCount = selected.size > 0 ? selected.size : activeBatch ? batchCounts[activeBatch.id] ?? 0 : 0;
   const scopeLabel = selected.size > 0 ? `${selected.size} selected` : activeBatch ? `all ${scopeCount} in "${activeBatch.tag}"` : "";
+
+  const doDeleteLot = async (mode) => {
+    setLotBusy(true); setError("");
+    try {
+      const r = await deleteLot(lotDel.id, mode);
+      setNotice(mode === "delete" ? `Deleted lot "${r.tag}" and removed ${r.affected} candidates from this job.` : `Cleared calling assignment for ${r.affected} candidates in "${r.tag}".`);
+      setLotDel(null);
+      if (mode === "delete") setBatchFilter("all");
+      await loadAll(job);
+    } catch (e) { setError(e.message); } finally { setLotBusy(false); }
+  };
+  const lotRows = lotDel ? rows.filter((r) => r.batch_id === lotDel.id) : [];
+  const lotWorked = lotRows.filter((r) => r.call_status !== "not_called" || r.rcs_status !== "not_started" || r.email_status !== "not_started" || r.linkedin_status !== "not_started").length;
+  const lotAssigned = lotRows.filter((r) => r.call_assigned_to).length;
 
   const patchLocal = (id, row) => setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...row } : r)));
 
@@ -160,6 +176,13 @@ export default function JobCandidates() {
           </button>
         ))}
       </div>
+
+      {activeBatch && (
+        <div className="lot-actions">
+          <span className="muted small">Lot "{activeBatch.tag}" · {batchCounts[activeBatch.id] ?? 0} candidates</span>
+          <button className="ghost sm danger" onClick={() => setLotDel(activeBatch)}>Delete lot / calling list…</button>
+        </div>
+      )}
 
       <div className={`bulkbar ${scopeCount ? "active" : ""}`}>
         {scopeCount ? (
@@ -283,6 +306,27 @@ export default function JobCandidates() {
           />
         )}
       </Drawer>
+      {lotDel && (
+        <div className="modal-overlay" onClick={() => !lotBusy && setLotDel(null)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Delete lot "{lotDel.tag}"</h3>
+            <p className="muted small">{lotRows.length} candidates · {lotAssigned} assigned for calling · {lotWorked} already worked on (called or contacted).</p>
+            <div className="lot-del-opts">
+              <button className="ghost" disabled={lotBusy || lotAssigned === 0} onClick={() => doDeleteLot("unassign")}>
+                <b>Clear the calling list only</b>
+                <span className="muted small">Unassign callers from this lot. Candidates and their history stay on the job.</span>
+              </button>
+              <button className="ghost danger" disabled={lotBusy} onClick={() => {
+                if (window.confirm(`Delete lot "${lotDel.tag}" and remove ${lotRows.length} candidates from this job? Their outreach history on this job is lost. This cannot be undone.`)) doDeleteLot("delete");
+              }}>
+                <b>Delete the whole lot</b>
+                <span className="muted small">Removes the lot and its candidates from this job, including their calling assignments and history. People stay in the master candidate list.</span>
+              </button>
+            </div>
+            <div className="pos-actions"><button className="ghost" disabled={lotBusy} onClick={() => setLotDel(null)}>Cancel</button></div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

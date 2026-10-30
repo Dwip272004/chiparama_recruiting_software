@@ -346,3 +346,9 @@ export const toLocalInput = (iso) => {
   const off = d.getTimezoneOffset() * 60000;
   return new Date(d.getTime() - off).toISOString().slice(0, 16);
 };
+
+export async function deleteLot(batchId, mode) {
+  const { data, error } = await supabase.rpc("delete_candidate_lot", { p_batch_id: batchId, p_mode: mode });
+  if (error) throw error;
+  return data;
+}
