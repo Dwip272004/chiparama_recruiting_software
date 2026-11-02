@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { setPresenceDetail } from "../lib/presence";
 import { StatusPill } from "../components/StatusSelect";
 import {
   CALL_STATUSES, CHANNELS, fetchActivity, fetchCallList, logCall, callBucket, sortForCalling,
@@ -61,6 +62,11 @@ export default function CallProfile() {
   }, []);
 
   const row = rows?.find((r) => r.id === rowId);
+  const detailText = row ? [row.job?.job_code, row.batch?.tag].filter(Boolean).join(" · ") : "";
+  useEffect(() => {
+    setPresenceDetail(detailText);
+    return () => setPresenceDetail("");
+  }, [detailText]);
   const pos = queue.indexOf(rowId);
   const go = useCallback((id) => navigate(`/calling/${id}${qs ? `?${qs}` : ""}`), [navigate, qs]);
 

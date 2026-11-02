@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { ROLES } from "../lib/roles";
 import TopBar from "./TopBar";
-import { GridIcon, BriefcaseIcon, PhoneIcon, LogoutIcon, SendIcon, ChatIcon, MailIcon, FileIcon } from "./Icons";
+import { GridIcon, BriefcaseIcon, PhoneIcon, LogoutIcon, SendIcon, ChatIcon, MailIcon, FileIcon, PulseIcon } from "./Icons";
+import { trackPresence, stopTracking } from "../lib/presence";
 import { fetchInmailPendingCount } from "../lib/inmail";
 import { fetchNewFeedbackCount } from "../lib/feedback";
 import "../jobs.css";
@@ -14,6 +15,7 @@ const NAV = [
   { to: "/jobs", label: "Jobs", perm: "jobs.view", Icon: BriefcaseIcon },
   { to: "/positions", label: "Open positions", perm: "positions.view", Icon: FileIcon },
   { to: "/calling", label: "Calling list", perm: "calling.view", Icon: PhoneIcon },
+  { to: "/online", label: "Online now", perm: "presence.view", Icon: PulseIcon },
   { to: "/email", label: "Email outreach", perm: "email.manage", Icon: MailIcon },
   { to: "/inmails", label: "InMails", perm: "inmail.view", Icon: SendIcon, badge: "inmail" },
   { to: "/feedback", label: "Feedback", perm: "feedback.submit", Icon: ChatIcon, badge: "feedback" },
@@ -23,6 +25,13 @@ export default function Layout() {
   const { profile, role, can, signOut } = useAuth();
   const [inmailWaiting, setInmailWaiting] = useState(0);
   const [fbNew, setFbNew] = useState(0);
+  const { pathname } = useLocation();
+  // announce this tab as "online" while the user is on the calling pages
+  useEffect(() => {
+    if (!profile) return;
+    if (pathname.startsWith("/calling")) trackPresence(profile, { page: pathname === "/calling" ? "list" : "call" });
+    else stopTracking();
+  }, [pathname, profile]);
   useEffect(() => {
     if (!can("feedback.manage")) return;
     const load = () => fetchNewFeedbackCount().then(setFbNew).catch(() => {});

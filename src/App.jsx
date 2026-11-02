@@ -13,6 +13,7 @@ import Inmails from "./pages/Inmails";
 import Feedback from "./pages/Feedback";
 import EmailOutreach from "./pages/EmailOutreach";
 import Positions from "./pages/Positions";
+import OnlineUsers from "./pages/OnlineUsers";
 
 export default function App() {
   return (
@@ -50,6 +51,14 @@ export default function App() {
               element={
                 <ProtectedRoute permission="calling.view">
                   <CallingList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/online"
+              element={
+                <ProtectedRoute permission="presence.view">
+                  <OnlineUsers />
                 </ProtectedRoute>
               }
             />

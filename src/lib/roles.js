@@ -19,6 +19,7 @@ export const PERMISSIONS = {
     "jobs.statuses", // manage the list of statuses
     "candidates.manage", // upload lots, manage the 4 outreach channels
     "calling.view", // calling list (admins see every caller's list)
+    "presence.view", // see who is online on the calling pages
     "positions.view",
     "positions.priority", // only admins set position priority
     "feedback.submit", // feedback.manage is Dwip-only (via "*")
