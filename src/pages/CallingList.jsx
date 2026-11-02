@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { StatusPill } from "../components/StatusSelect";
 import { fetchCallList, fetchCallers, callBucket, sortForCalling, fmtDateTime } from "../lib/outreach";
+import DeleteLotModal from "../components/DeleteLotModal";
 import { InmailBadge, InmailRequestModal } from "../components/InmailRequest";
 import { fetchPendingInmailIds, inmailState } from "../lib/inmail";
 import "../outreach.css";
@@ -24,6 +25,8 @@ export default function CallingList() {
   const [view, setView] = useState("queue");
   const [jobFilter, setJobFilter] = useState("");
   const [callerFilter, setCallerFilter] = useState("");
+  const [lotFilter, setLotFilter] = useState("");
+  const [lotDel, setLotDel] = useState(null);
   const [q, setQ] = useState("");
   const [pendingIds, setPendingIds] = useState(new Set());
   const [sel, setSel] = useState(new Set());
@@ -52,6 +55,18 @@ export default function CallingList() {
     return [...m.entries()];
   }, [rows]);
 
+  // lots present in this list (a lot belongs to exactly one job), narrowed by the job filter
+  const lots = useMemo(() => {
+    const m = new Map();
+    rows.forEach((r) => {
+      if (!r.batch?.id || (jobFilter && r.job_id !== jobFilter)) return;
+      const cur = m.get(r.batch.id) ?? { id: r.batch.id, tag: r.batch.tag, job_code: r.job?.job_code, n: 0 };
+      cur.n++;
+      m.set(r.batch.id, cur);
+    });
+    return [...m.values()].sort((a, b) => `${a.job_code}${a.tag}`.localeCompare(`${b.job_code}${b.tag}`));
+  }, [rows, jobFilter]);
+
   const stats = useMemo(() => {
     const s = { new: 0, callback: 0, retry: 0, done: 0, interested: 0 };
     rows.forEach((r) => {
@@ -72,12 +87,13 @@ export default function CallingList() {
           if (view === "done" && b !== "done") return false;
           if (jobFilter && r.job_id !== jobFilter) return false;
           if (callerFilter && r.call_assigned_to !== callerFilter) return false;
+          if (lotFilter && r.batch_id !== lotFilter) return false;
           if (!q.trim()) return true;
           const c = r.candidate;
-          return `${c.full_name} ${c.phone ?? ""} ${c.current_company ?? ""}`.toLowerCase().includes(q.toLowerCase());
+          return `${c.full_name} ${c.phone ?? ""} ${c.current_company ?? ""} ${r.batch?.tag ?? ""}`.toLowerCase().includes(q.toLowerCase());
         })
         .sort(sortForCalling),
-    [rows, view, jobFilter, callerFilter, q]
+    [rows, view, jobFilter, callerFilter, lotFilter, q]
   );
 
   const eligible = (r) => inmailState(r, pendingIds) === "none";
@@ -93,9 +109,16 @@ export default function CallingList() {
     try { setPendingIds(await fetchPendingInmailIds()); const fresh = await fetchCallList(); setRows(fresh); } catch { /* ignore */ }
   };
 
+  const onLotDeleted = async (mode, r) => {
+    setLotDel(null);
+    setLotFilter("");
+    setFlash(mode === "delete" ? `Deleted lot "${r.tag}" and removed ${r.affected} candidates from the job.` : `Cleared the calling list for lot "${r.tag}" (${r.affected} candidates unassigned).`);
+    try { setRows(await fetchCallList()); } catch (e) { setError(e.message); }
+  };
+
   const open = (id) => navigate(`/calling/${id}${jobFilter ? `?job=${jobFilter}` : ""}`);
   const firstToCall = rows
-    .filter((r) => callBucket(r) !== "done" && (!jobFilter || r.job_id === jobFilter) && (!callerFilter || r.call_assigned_to === callerFilter))
+    .filter((r) => callBucket(r) !== "done" && (!jobFilter || r.job_id === jobFilter) && (!callerFilter || r.call_assigned_to === callerFilter) && (!lotFilter || r.batch_id === lotFilter))
     .sort(sortForCalling)[0];
 
   const countFor = (k) => (k === "queue" ? stats.new + stats.callback + stats.retry : k === "done" ? stats.done : rows.length);
@@ -127,9 +150,13 @@ export default function CallingList() {
             {l} <span>{countFor(k)}</span>
           </button>
         ))}
-        <select className="mini" value={jobFilter} onChange={(e) => setJobFilter(e.target.value)}>
+        <select className="mini" value={jobFilter} onChange={(e) => { setJobFilter(e.target.value); setLotFilter(""); }}>
           <option value="">All jobs</option>
           {jobs.map(([id, j]) => (<option key={id} value={id}>{j.job_code} {j.title ?? ""}</option>))}
+        </select>
+        <select className="mini" value={lotFilter} onChange={(e) => setLotFilter(e.target.value)}>
+          <option value="">All lots</option>
+          {lots.map((l) => (<option key={l.id} value={l.id}>{jobFilter ? l.tag : `${l.job_code} · ${l.tag}`} ({l.n})</option>))}
         </select>
         {isAdmin && (
           <select className="mini" value={callerFilter} onChange={(e) => setCallerFilter(e.target.value)}>
@@ -137,8 +164,15 @@ export default function CallingList() {
             {callers.map((c) => (<option key={c.id} value={c.id}>{c.full_name}</option>))}
           </select>
         )}
-        <input className="search" placeholder="Search name, phone, company…" value={q} onChange={(e) => setQ(e.target.value)} />
+        <input className="search" placeholder="Search name, phone, company, lot…" value={q} onChange={(e) => setQ(e.target.value)} />
       </div>
+
+      {isAdmin && lotFilter && (
+        <div className="lot-actions">
+          <span className="muted small">Lot "{lots.find((l) => l.id === lotFilter)?.tag}" · {lots.find((l) => l.id === lotFilter)?.n ?? 0} on the calling list</span>
+          <button className="ghost sm danger" onClick={() => setLotDel(lots.find((l) => l.id === lotFilter))}>Delete lot / calling list…</button>
+        </div>
+      )}
 
       {loading ? (
         <div className="empty">Loading…</div>
@@ -154,7 +188,7 @@ export default function CallingList() {
             <thead>
               <tr>
                 {canRequest && <th style={{ width: 34 }}><input type="checkbox" checked={allSel} onChange={toggleAll} aria-label="Select all" title="Select all that can be requested" /></th>}
-                <th>Candidate</th><th>Phone</th><th>Job</th><th>Status</th><th>Attempts</th><th>Last called</th><th>LinkedIn InMail</th>
+                <th>Candidate</th><th>Phone</th><th>Job</th><th>Lot</th><th>Status</th><th>Attempts</th><th>Last called</th><th>LinkedIn InMail</th>
                 {isAdmin && <th>Caller</th>}
               </tr>
             </thead>
@@ -172,6 +206,7 @@ export default function CallingList() {
                   </td>
                   <td className="mono">{r.candidate.phone ?? "—"}</td>
                   <td className="small"><span className="mono">{r.job?.job_code}</span> {r.job?.title}</td>
+                  <td className="small">{r.batch?.tag ? <span className="tag">{r.batch.tag}</span> : <span className="muted">—</span>}</td>
                   <td><StatusPill channel="call" value={r.call_status} /></td>
                   <td>{r.call_attempts}</td>
                   <td className="muted small">{r.last_called_at ? fmtDateTime(r.last_called_at) : "—"}</td>
@@ -190,6 +225,7 @@ export default function CallingList() {
           <button className="primary" onClick={() => setModal(true)}>Request LinkedIn InMail</button>
         </div>
       )}
+      {lotDel && <DeleteLotModal lot={lotDel} onClose={() => setLotDel(null)} onDone={onLotDeleted} />}
       {modal && <InmailRequestModal rows={selectedRows} onClose={() => setModal(false)} onDone={afterRequest} />}
     </div>
   );

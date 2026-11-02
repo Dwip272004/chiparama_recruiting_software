@@ -347,6 +347,22 @@ export const toLocalInput = (iso) => {
   return new Date(d.getTime() - off).toISOString().slice(0, 16);
 };
 
+// Real counts for a lot (the calling list only holds assigned rows, so it can't tell us these)
+export async function fetchLotStats(batchId) {
+  const rows = await fetchAll(() =>
+    supabase
+      .from("job_candidates")
+      .select("id,call_assigned_to,call_status,rcs_status,email_status,linkedin_status")
+      .eq("batch_id", batchId)
+      .order("id")
+  );
+  return {
+    total: rows.length,
+    assigned: rows.filter((r) => r.call_assigned_to).length,
+    worked: rows.filter((r) => r.call_status !== "not_called" || r.rcs_status !== "not_started" || r.email_status !== "not_started" || r.linkedin_status !== "not_started").length,
+  };
+}
+
 export async function deleteLot(batchId, mode) {
   const { data, error } = await supabase.rpc("delete_candidate_lot", { p_batch_id: batchId, p_mode: mode });
   if (error) throw error;
