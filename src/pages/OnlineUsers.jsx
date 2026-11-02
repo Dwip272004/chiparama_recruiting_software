@@ -3,7 +3,11 @@ import { watchPresence } from "../lib/presence";
 import { ROLES } from "../lib/roles";
 import "../outreach.css";
 
-const PAGE_LABEL = { list: "On the calling list", call: "On a call screen" };
+const PAGE_LABEL = {
+  list: "On the calling list", call: "On a call screen", dashboard: "Dashboard", jobs: "Jobs", positions: "Open positions",
+  email: "Email outreach", inmails: "InMails", feedback: "Feedback", online: "Online now",
+};
+const isCalling = (u) => u.page === "list" || u.page === "call";
 
 const ago = (t, now) => {
   const m = Math.max(0, Math.floor((now - t) / 60000));
@@ -15,6 +19,8 @@ const ago = (t, now) => {
 export default function OnlineUsers() {
   const [users, setUsers] = useState([]);
   const [now, setNow] = useState(Date.now());
+  const sorted = [...users].sort((a, b) => Number(isCalling(b)) - Number(isCalling(a)) || a.name.localeCompare(b.name));
+  const calling = users.filter(isCalling).length;
 
   useEffect(() => watchPresence(setUsers), []);
   useEffect(() => {
@@ -27,22 +33,22 @@ export default function OnlineUsers() {
       <div className="page-head">
         <div>
           <h1>Online now</h1>
-          <div className="muted">People currently on the calling pages. Updates live.</div>
+          <div className="muted">Everyone signed in right now, admins included. People using the calling tool are listed first. Updates live.</div>
         </div>
-        <span className="tag good">{users.length} online</span>
+        <span className="tag good">{users.length} online · {calling} calling</span>
       </div>
       {users.length === 0 ? (
-        <div className="empty">Nobody is on the calling pages right now.</div>
+        <div className="empty">Nobody is online right now.</div>
       ) : (
         <div className="table-wrap">
           <table className="list">
-            <thead><tr><th>Person</th><th>Role</th><th>Doing</th><th>Working on</th><th>Online for</th></tr></thead>
+            <thead><tr><th>Person</th><th>Role</th><th>Where</th><th>Working on</th><th>Online for</th></tr></thead>
             <tbody>
-              {users.map((u) => (
+              {sorted.map((u) => (
                 <tr key={u.id}>
                   <td><span className="dot" style={{ background: "var(--green-fg, #22c55e)" }} /> <b>{u.name}</b>{u.tabs > 1 && <span className="muted small"> · {u.tabs} tabs</span>}</td>
                   <td className="small">{ROLES[u.role]?.label ?? u.role}</td>
-                  <td className="small">{PAGE_LABEL[u.page] ?? "Calling"}</td>
+                  <td className="small">{PAGE_LABEL[u.page] ?? u.page}</td>
                   <td className="small">{u.detail || <span className="muted">—</span>}</td>
                   <td className="muted small">{ago(u.since, now)}</td>
                 </tr>

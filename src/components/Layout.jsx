@@ -26,12 +26,14 @@ export default function Layout() {
   const [inmailWaiting, setInmailWaiting] = useState(0);
   const [fbNew, setFbNew] = useState(0);
   const { pathname } = useLocation();
-  // announce this tab as "online" while the user is on the calling pages
+  // announce this tab as online, with the section the user is in
   useEffect(() => {
     if (!profile) return;
-    if (pathname.startsWith("/calling")) trackPresence(profile, { page: pathname === "/calling" ? "list" : "call" });
-    else stopTracking();
+    const seg = pathname.split("/")[1] || "dashboard";
+    const page = seg === "calling" ? (pathname === "/calling" ? "list" : "call") : seg;
+    trackPresence(profile, { page });
   }, [pathname, profile]);
+  useEffect(() => stopTracking, []);
   useEffect(() => {
     if (!can("feedback.manage")) return;
     const load = () => fetchNewFeedbackCount().then(setFbNew).catch(() => {});
