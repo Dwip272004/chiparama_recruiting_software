@@ -35,6 +35,8 @@ export default function CallProfile() {
   const { rowId } = useParams();
   const [sp] = useSearchParams();
   const jobParam = sp.get("job") || "";
+  const lotParam = sp.get("lot") || "";
+  const qs = [jobParam && `job=${jobParam}`, lotParam && `lot=${lotParam}`].filter(Boolean).join("&");
   const navigate = useNavigate();
 
   const [rows, setRows] = useState(null);
@@ -48,7 +50,7 @@ export default function CallProfile() {
       .then((r) => {
         setRows(r);
         setQueue(
-          r.filter((x) => callBucket(x) !== "done" && (!jobParam || x.job_id === jobParam))
+          r.filter((x) => callBucket(x) !== "done" && (!jobParam || x.job_id === jobParam) && (!lotParam || x.batch_id === lotParam))
             .sort(sortForCalling)
             .map((x) => x.id)
         );
@@ -60,7 +62,7 @@ export default function CallProfile() {
 
   const row = rows?.find((r) => r.id === rowId);
   const pos = queue.indexOf(rowId);
-  const go = useCallback((id) => navigate(`/calling/${id}${jobParam ? `?job=${jobParam}` : ""}`), [navigate, jobParam]);
+  const go = useCallback((id) => navigate(`/calling/${id}${qs ? `?${qs}` : ""}`), [navigate, qs]);
 
   const nextId = useMemo(() => {
     if (!rows) return null;

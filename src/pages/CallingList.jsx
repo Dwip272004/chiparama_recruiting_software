@@ -60,8 +60,9 @@ export default function CallingList() {
     const m = new Map();
     rows.forEach((r) => {
       if (!r.batch?.id || (jobFilter && r.job_id !== jobFilter)) return;
-      const cur = m.get(r.batch.id) ?? { id: r.batch.id, tag: r.batch.tag, job_code: r.job?.job_code, n: 0 };
+      const cur = m.get(r.batch.id) ?? { id: r.batch.id, tag: r.batch.tag, job_code: r.job?.job_code, n: 0, todo: 0 };
       cur.n++;
+      if (callBucket(r) !== "done") cur.todo++;
       m.set(r.batch.id, cur);
     });
     return [...m.values()].sort((a, b) => `${a.job_code}${a.tag}`.localeCompare(`${b.job_code}${b.tag}`));
@@ -116,7 +117,10 @@ export default function CallingList() {
     try { setRows(await fetchCallList()); } catch (e) { setError(e.message); }
   };
 
-  const open = (id) => navigate(`/calling/${id}${jobFilter ? `?job=${jobFilter}` : ""}`);
+  const open = (id) => {
+    const qs = [jobFilter && `job=${jobFilter}`, lotFilter && `lot=${lotFilter}`].filter(Boolean).join("&");
+    navigate(`/calling/${id}${qs ? `?${qs}` : ""}`);
+  };
   const firstToCall = rows
     .filter((r) => callBucket(r) !== "done" && (!jobFilter || r.job_id === jobFilter) && (!callerFilter || r.call_assigned_to === callerFilter) && (!lotFilter || r.batch_id === lotFilter))
     .sort(sortForCalling)[0];
@@ -154,10 +158,10 @@ export default function CallingList() {
           <option value="">All jobs</option>
           {jobs.map(([id, j]) => (<option key={id} value={id}>{j.job_code} {j.title ?? ""}</option>))}
         </select>
-        <select className="mini" value={lotFilter} onChange={(e) => setLotFilter(e.target.value)}>
+        {!jobFilter && <select className="mini" value={lotFilter} onChange={(e) => setLotFilter(e.target.value)}>
           <option value="">All lots</option>
           {lots.map((l) => (<option key={l.id} value={l.id}>{jobFilter ? l.tag : `${l.job_code} · ${l.tag}`} ({l.n})</option>))}
-        </select>
+        </select>}
         {isAdmin && (
           <select className="mini" value={callerFilter} onChange={(e) => setCallerFilter(e.target.value)}>
             <option value="">All callers</option>
@@ -166,6 +170,19 @@ export default function CallingList() {
         )}
         <input className="search" placeholder="Search name, phone, company, lot…" value={q} onChange={(e) => setQ(e.target.value)} />
       </div>
+
+      {jobFilter && lots.length > 0 && (
+        <div className="lots">
+          <button className={`lot ${!lotFilter ? "on" : ""}`} onClick={() => setLotFilter("")}>
+            <b>All lots</b><span>{lots.reduce((a, l) => a + l.todo, 0)} to call · {lots.reduce((a, l) => a + l.n, 0)} total</span>
+          </button>
+          {lots.map((l) => (
+            <button key={l.id} className={`lot ${lotFilter === l.id ? "on" : ""}`} onClick={() => setLotFilter(l.id)}>
+              <b>{l.tag}</b><span>{l.todo} to call · {l.n} total</span>
+            </button>
+          ))}
+        </div>
+      )}
 
       {isAdmin && lotFilter && (
         <div className="lot-actions">
