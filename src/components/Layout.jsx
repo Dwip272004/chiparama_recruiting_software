@@ -4,7 +4,7 @@ import { useAuth } from "../auth/AuthContext";
 import { ROLES } from "../lib/roles";
 import TopBar from "./TopBar";
 import { GridIcon, BriefcaseIcon, PhoneIcon, LogoutIcon, SendIcon, ChatIcon, MailIcon, FileIcon, PulseIcon } from "./Icons";
-import { trackPresence, stopTracking } from "../lib/presence";
+import { trackPresence, stopTracking, sendHeartbeat } from "../lib/presence";
 import { fetchInmailPendingCount } from "../lib/inmail";
 import { fetchNewFeedbackCount } from "../lib/feedback";
 import "../jobs.css";
@@ -34,6 +34,13 @@ export default function Layout() {
     trackPresence(profile, { page });
   }, [pathname, profile]);
   useEffect(() => stopTracking, []);
+  // record time online: a heartbeat every minute while the app is open
+  useEffect(() => {
+    if (!profile) return;
+    sendHeartbeat();
+    const t = setInterval(sendHeartbeat, 60000);
+    return () => clearInterval(t);
+  }, [profile?.id]);
   useEffect(() => {
     if (!can("feedback.manage")) return;
     const load = () => fetchNewFeedbackCount().then(setFbNew).catch(() => {});

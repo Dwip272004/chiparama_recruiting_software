@@ -66,3 +66,13 @@ export function watchPresence(fn) {
   if (subscribed) fn(snapshot());
   return () => listeners.delete(fn);
 }
+
+/* ---------- recorded time online (needs migration 016) ---------- */
+
+export const sendHeartbeat = () => supabase.rpc("presence_heartbeat").then(() => {}, () => {});
+
+export async function fetchPresenceSummary() {
+  const { data, error } = await supabase.rpc("presence_summary", { p_tz: Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Kolkata" });
+  if (error) throw error;
+  return data;
+}
