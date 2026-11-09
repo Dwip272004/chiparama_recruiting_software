@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import StatusSelect from "./StatusSelect";
-import { CHANNELS, fetchActivity, statusMeta, channelByKey, fmtDateTime } from "../lib/outreach";
+import { CHANNELS, fetchActivity, statusMeta, channelByKey, fmtDateTime, toLocalInput } from "../lib/outreach";
 
 const FIELDS = [
   ["full_name", "Name"],
@@ -18,7 +18,7 @@ const FIELDS = [
 ];
 
 // Admin view of one candidate on one job: details, 4 channel statuses, caller, history.
-export default function CandidateDrawer({ row, callers, onChannel, onAssign, onSaveCandidate, onRemove }) {
+export default function CandidateDrawer({ row, callers, onChannel, onAssign, onSaveCandidate, onRemove, onStage, onInterview }) {
   const c = row.candidate;
   const [form, setForm] = useState(() => ({
     ...Object.fromEntries(FIELDS.map(([k]) => [k, c[k] ?? ""])),
@@ -62,10 +62,12 @@ export default function CandidateDrawer({ row, callers, onChannel, onAssign, onS
   };
 
   const describe = (a) => {
+    if (a.channel === "interview")
+      return a.to_status ? `Interview set for ${fmtDateTime(a.to_status)}` : "Interview time cleared";
     if (a.channel === "assignment")
       return `Calling assigned: ${a.from_status ? callerName(a.from_status) : "Unassigned"} → ${a.to_status ? callerName(a.to_status) : "Unassigned"}`;
     const ch = channelByKey(a.channel);
-    return `${ch?.label ?? a.channel}: ${statusMeta(a.channel, a.from_status)?.label ?? a.from_status} → ${statusMeta(a.channel, a.to_status)?.label ?? a.to_status}`;
+    return `${ch?.label ?? (a.channel === "stage" ? "Stage" : a.channel)}: ${statusMeta(a.channel, a.from_status)?.label ?? a.from_status} → ${statusMeta(a.channel, a.to_status)?.label ?? a.to_status}`;
   };
 
   return (
@@ -74,6 +76,21 @@ export default function CandidateDrawer({ row, callers, onChannel, onAssign, onS
         <span>Lot: <b>{row.batch?.tag ?? "—"}</b></span>
         <span>Added {fmtDateTime(row.created_at)}</span>
       </div>
+
+      <section>
+        <h4>Pipeline stage</h4>
+        <div className="channel-grid">
+          <label>
+            Stage
+            <StatusSelect channel="stage" value={row.stage} onChange={onStage} />
+          </label>
+          <label>
+            Interview date &amp; time
+            <input type="datetime-local" value={toLocalInput(row.interview_at)} onChange={(e) => onInterview(e.target.value ? new Date(e.target.value).toISOString() : null)} />
+          </label>
+        </div>
+        <div className="hint">Early stages move on their own from outreach results (contacted, interested). From shortlisted onwards you set the stage.</div>
+      </section>
 
       <section>
         <h4>Outreach status</h4>

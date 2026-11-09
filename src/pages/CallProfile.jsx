@@ -204,6 +204,7 @@ function Profile({ row, pos, total, upNext, onSaved, onGo, nextId, prevId, onFin
               </div>
             </div>
             <div className="ph-status">
+              <StatusPill channel="stage" value={row.stage} />
               <StatusPill channel="call" value={row.call_status} />
               <div className="muted small">Attempts: <b>{row.call_attempts}</b></div>
               <div className="muted small">Last called: {row.last_called_at ? fmtDateTime(row.last_called_at) : "never"}</div>
@@ -283,7 +284,7 @@ function Profile({ row, pos, total, upNext, onSaved, onGo, nextId, prevId, onFin
                 {activity.map((a) => (
                   <li key={a.id}>
                     <div>
-                      {a.channel === "assignment" ? "Assigned for calling" : (
+                      {a.channel === "interview" ? (a.to_status ? `Interview set for ${fmtDateTime(a.to_status)}` : "Interview time cleared") : a.channel === "assignment" ? "Assigned for calling" : (
                         <><span className="muted small">{a.channel === "call" ? "Call" : a.channel}: </span>
                           <StatusPill channel={a.channel} value={a.to_status} /></>
                       )}

@@ -33,7 +33,23 @@ export const CALL_STATUSES = [
   { key: "do_not_call", label: "Do not call", color: "red" },
 ];
 
-export const statusOptions = (channel) => (channel === "call" ? CALL_STATUSES : MSG_STATUSES);
+// ATS pipeline stage of a candidate on a job (separate from the outreach channels)
+export const STAGES = [
+  { key: "sourced", label: "Sourced", color: "gray" },
+  { key: "contacted", label: "Contacted", color: "gray" },
+  { key: "interested", label: "Interested", color: "blue" },
+  { key: "shortlisted", label: "Shortlisted", color: "blue" },
+  { key: "submitted", label: "Submitted to client", color: "purple" },
+  { key: "interview_scheduled", label: "Interview scheduled", color: "amber" },
+  { key: "interview_done", label: "Interview done", color: "amber" },
+  { key: "offered", label: "Offered", color: "green" },
+  { key: "joined", label: "Joined", color: "green" },
+  { key: "on_hold", label: "On hold", color: "orange" },
+  { key: "rejected", label: "Rejected", color: "red" },
+  { key: "withdrawn", label: "Withdrawn", color: "red" },
+];
+
+export const statusOptions = (channel) => (channel === "stage" ? STAGES : channel === "call" ? CALL_STATUSES : MSG_STATUSES);
 export const statusMeta = (channel, key) => statusOptions(channel).find((s) => s.key === key);
 export const channelByKey = (key) => CHANNELS.find((c) => c.key === key);
 

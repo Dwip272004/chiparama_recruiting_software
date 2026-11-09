@@ -2,13 +2,13 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Drawer from "../components/Drawer";
 import StatusBadge from "../components/StatusBadge";
-import StatusSelect from "../components/StatusSelect";
+import StatusSelect, { StatusPill } from "../components/StatusSelect";
 import UploadCandidates from "../components/UploadCandidates";
 import CandidateDrawer from "../components/CandidateDrawer";
 import DeleteLotModal from "../components/DeleteLotModal";
 import { fetchStatuses } from "../lib/jobs";
 import {
-  CHANNELS, statusOptions, statusMeta, fetchJobByCode, fetchBatches, fetchJobCandidates, fetchCallers,
+  CHANNELS, STAGES, statusOptions, statusMeta, fetchJobByCode, fetchBatches, fetchJobCandidates, fetchCallers,
   updateJobCandidate, bulkUpdateIds, bulkUpdateBatch, removeFromJob, updateCandidate,
 } from "../lib/outreach";
 import "../outreach.css";
@@ -29,6 +29,8 @@ export default function JobCandidates() {
   const [q, setQ] = useState("");
   const [fChannel, setFChannel] = useState("");
   const [fStatus, setFStatus] = useState("");
+  const [fStage, setFStage] = useState("");
+  const [bulkStage, setBulkStage] = useState("interested");
   const [selected, setSelected] = useState(new Set());
   const [bulkChannel, setBulkChannel] = useState("linkedin");
   const [bulkStatus, setBulkStatus] = useState("sent");
@@ -72,6 +74,7 @@ export default function JobCandidates() {
   const filterCol = CHANNELS.find((c) => c.key === fChannel)?.col;
   const visible = rows.filter((r) => {
     if (batchFilter !== "all" && r.batch_id !== batchFilter) return false;
+    if (fStage && r.stage !== fStage) return false;
     if (filterCol && fStatus && r[filterCol] !== fStatus) return false;
     if (!q.trim()) return true;
     const c = r.candidate;
@@ -88,6 +91,29 @@ export default function JobCandidates() {
     setLotDel(null);
     if (mode === "delete") setBatchFilter("all");
     await loadAll(job);
+  };
+
+  const stageCounts = useMemo(() => {
+    const m = {};
+    rows.filter((r) => batchFilter === "all" || r.batch_id === batchFilter).forEach((r) => (m[r.stage] = (m[r.stage] ?? 0) + 1));
+    return m;
+  }, [rows, batchFilter]);
+
+  const setStage = async (row, stage) => {
+    const prev = row.stage;
+    patchLocal(row.id, { stage });
+    try {
+      patchLocal(row.id, await updateJobCandidate(row.id, { stage }));
+      // an interview needs a date: open the candidate so it can be set
+      if (stage === "interview_scheduled" && !row.interview_at) setOpenId(row.id);
+    } catch (e) {
+      patchLocal(row.id, { stage: prev });
+      setError(e.message);
+    }
+  };
+  const setInterview = async (row, interview_at) => {
+    try { patchLocal(row.id, await updateJobCandidate(row.id, { interview_at })); }
+    catch (e) { setError(e.message); }
   };
 
   const patchLocal = (id, row) => setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...row } : r)));
@@ -205,10 +231,28 @@ export default function JobCandidates() {
               </button>
               {selected.size > 0 && <button className="link" onClick={() => setSelected(new Set())}>Clear selection</button>}
             </div>
+            <div className="bulk-row">
+              <select value={bulkStage} onChange={(e) => setBulkStage(e.target.value)}>
+                {STAGES.map((st) => (<option key={st.key} value={st.key}>{st.label}</option>))}
+              </select>
+              <button className="ghost" disabled={working} onClick={() =>
+                runBulk({ stage: bulkStage }, `Move to stage "${STAGES.find((x) => x.key === bulkStage).label}"`)}>
+                Move stage
+              </button>
+            </div>
           </>
         ) : (
           <div className="hint">Tick candidates, or pick a lot above, to change statuses or assign calling in bulk.</div>
         )}
+      </div>
+
+      <div className="filters">
+        <button className={`chip ${!fStage ? "on" : ""}`} onClick={() => setFStage("")}>All stages</button>
+        {STAGES.filter((st) => stageCounts[st.key] || fStage === st.key).map((st) => (
+          <button key={st.key} className={`chip ${fStage === st.key ? "on" : ""}`} onClick={() => setFStage(fStage === st.key ? "" : st.key)}>
+            {st.label} <span>{stageCounts[st.key] ?? 0}</span>
+          </button>
+        ))}
       </div>
 
       <div className="filters">
@@ -234,7 +278,7 @@ export default function JobCandidates() {
             <thead>
               <tr>
                 <th><input type="checkbox" checked={allVisibleSelected} onChange={toggleAll} /></th>
-                <th>Candidate</th><th>Lot</th>
+                <th>Candidate</th><th>Lot</th><th>Stage</th>
                 {CHANNELS.map((c) => (<th key={c.key}>{c.label}</th>))}
                 <th>Caller</th>
               </tr>
@@ -255,6 +299,12 @@ export default function JobCandidates() {
                     </div>
                   </td>
                   <td className="muted small">{r.batch?.tag ?? "—"}</td>
+                  <td>
+                    <StatusSelect channel="stage" value={r.stage} onChange={(v) => setStage(r, v)} />
+                    {r.interview_at && ["interview_scheduled", "interview_done"].includes(r.stage) && (
+                      <div className="muted small">{new Date(r.interview_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</div>
+                    )}
+                  </td>
                   {CHANNELS.map((c) => (
                     <td key={c.key}>
                       <StatusSelect channel={c.key} value={r[c.col]} onChange={(v) => setChannel(r, c.col, v)} />
@@ -284,6 +334,8 @@ export default function JobCandidates() {
             callers={callers}
             onChannel={(col, v) => setChannel(openRow, col, v)}
             onAssign={(id) => assign(openRow, id)}
+            onStage={(v) => setStage(openRow, v)}
+            onInterview={(v) => setInterview(openRow, v)}
             onSaveCandidate={async (patch) => {
               await updateCandidate(openRow.candidate_id, patch);
               patchLocal(openRow.id, { candidate: { ...openRow.candidate, ...patch } });

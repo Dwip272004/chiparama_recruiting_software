@@ -205,7 +205,7 @@ export default function CallingList() {
             <thead>
               <tr>
                 {canRequest && <th style={{ width: 34 }}><input type="checkbox" checked={allSel} onChange={toggleAll} aria-label="Select all" title="Select all that can be requested" /></th>}
-                <th>Candidate</th><th>Phone</th><th>Job</th><th>Lot</th><th>Status</th><th>Attempts</th><th>Last called</th><th>LinkedIn InMail</th>
+                <th>Candidate</th><th>Phone</th><th>Job</th><th>Lot</th><th>Stage</th><th>Status</th><th>Attempts</th><th>Last called</th><th>LinkedIn InMail</th>
                 {isAdmin && <th>Caller</th>}
               </tr>
             </thead>
@@ -224,6 +224,7 @@ export default function CallingList() {
                   <td className="mono">{r.candidate.phone ?? "—"}</td>
                   <td className="small"><span className="mono">{r.job?.job_code}</span> {r.job?.title}</td>
                   <td className="small">{r.batch?.tag ? <span className="tag">{r.batch.tag}</span> : <span className="muted">—</span>}</td>
+                  <td><StatusPill channel="stage" value={r.stage} /></td>
                   <td><StatusPill channel="call" value={r.call_status} /></td>
                   <td>{r.call_attempts}</td>
                   <td className="muted small">{r.last_called_at ? fmtDateTime(r.last_called_at) : "—"}</td>
